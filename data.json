@@ -1,0 +1,86 @@
+{
+  "entradas": [
+    {
+      "id": 1,
+      "origem": "FDTE",
+      "valor": 7117.98,
+      "data": "10/02/2022"
+    },
+    {
+      "id": 2,
+      "origem": "Kotaki",
+      "valor": 2880.0,
+      "data": "10/02/2022"
+    },
+    {
+      "id": 3,
+      "origem": "Plantão FDTE",
+      "valor": 290.77,
+      "data": "10/02/2022"
+    }
+  ],
+  "saidas": [
+    {
+      "id": 1,
+      "origem": "FDTE",
+      "valor": 7117.98,
+      "data": "10/02/2022"
+    },
+    {
+      "id": 2,
+      "origem": "Kotaki",
+      "valor": 2880.0,
+      "data": "10/02/2022"
+    },
+    {
+      "id": 3,
+      "origem": "Plantão FDTE",
+      "valor": 290.77,
+      "data": "10/02/2022"
+    },
+    {
+      "id": 4,
+      "origem": "FDTE",
+      "valor": 7117.98,
+      "data": "10/02/2022"
+    },
+    {
+      "id": 5,
+      "origem": "Kotaki",
+      "valor": 2880.0,
+      "data": "10/02/2022"
+    },
+    {
+      "id": 6,
+      "origem": "Plantão FDTE",
+      "valor": 290.77,
+      "data": "10/02/2022"
+    }
+  ],
+  "dividas": [
+    {
+      "id": 1,
+      "origem": "FDTE",
+      "valor": 7117.98,
+      "data": "10/02/2022",
+      "parcelaAtual": 1,
+      "parcelaTotal": 5
+    },
+    {
+      "id": 2,
+      "origem": "FDTE",
+      "valor": 7117.98,
+      "data": "10/02/2022",
+      "parcelaAtual": 1,
+      "parcelaTotal": 5
+    },
+    {
+      "id": 3,
+      "origem": "FDTE",
+      "valor": 158.0,
+      "data": "10/02/2022",
+      "parcelaAtual": 6,
+      "parcelaTotal": 10
+    }
+  ]
+}
