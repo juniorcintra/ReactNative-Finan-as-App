@@ -13,6 +13,11 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import CurrencyInput from 'react-native-currency-input';
 import {format} from 'date-fns';
 import DatePicker from 'react-native-modern-datepicker';
+import {Picker} from '@react-native-community/picker';
+
+import Cenario1Svg from './src/assets/svg/cenario-1.svg';
+import Cenario2Svg from './src/assets/svg/cenario-2.svg';
+import Cenario3Svg from './src/assets/svg/cenario-3.svg';
 
 import {
   MainView,
@@ -58,14 +63,20 @@ export default App = () => {
   const [valueInput, setValueInput] = useState(null);
   const [origem, setOrigem] = useState();
   const [date, setDate] = useState(new Date());
+  const [pickerSelect, setPickerSelect] = useState('');
 
   const [dadosEntradas, setDadosEntradas] = useState([]);
+  const [dadosSaidas, setDadosSaidas] = useState([]);
 
   async function handleGetData() {
     var dataEntradas = await AsyncStorage.getItem('entradas');
     var entradas = JSON.parse(dataEntradas);
 
+    var dataSaidas = await AsyncStorage.getItem('saidas');
+    var saidas = JSON.parse(dataSaidas);
+
     setDadosEntradas(entradas);
+    setDadosSaidas(saidas)
   }
 
   useEffect(() => {
@@ -135,6 +146,13 @@ export default App = () => {
         data: format(new Date(date), 'dd/MM/yyyy'),
       };
 
+      let dataSaidas = {
+        origem: origem,
+        valor: valueInput,
+        data: format(new Date(date), 'dd/MM/yyyy'),
+        cenario: pickerSelect
+      };
+
       if (typeModal === 'entradas') {
         let dataToSave = (await AsyncStorage.getItem('entradas')) || '[]';
         dataToSave = JSON.parse(dataToSave);
@@ -145,17 +163,28 @@ export default App = () => {
           },
         );
       }
+
+      if (typeModal === 'saidas') {
+        let dataToSave = (await AsyncStorage.getItem('saidas')) || '[]';
+        dataToSave = JSON.parse(dataToSave);
+        dataToSave.push(dataSaidas);
+        AsyncStorage.setItem('saidas', JSON.stringify(dataToSave)).then(
+          () => {
+            setShowModal(false);
+          },
+        );
+      }
     } catch (error) {
       alert(error);
     }
   };
-
+  console.log(dadosSaidas)
   const handleShowModal = type => {
     setTypeModal(type);
     setShowActions(false);
     setShowModal(true);
   };
-
+  
   return (
     <MainView>
       <StatusBar barStyle='light-content' backgroundColor='transparent' translucent />
@@ -199,7 +228,7 @@ export default App = () => {
           stateButton.entradas
             ? dadosEntradas
             : stateButton.saidas
-            ? data.saidas
+            ? dadosSaidas
             : data.dividas
         }
         renderItem={({item}) => (
@@ -224,6 +253,11 @@ export default App = () => {
                   currency: 'BRL',
                 }).format(item.valor)}
               </ValorItem>
+              
+              {item.cenario === '1' && <Text>Teste1</Text> }
+              {item.cenario === '2' && <Text>Teste2</Text>}
+              {item.cenario === '3' && <Text>Teste3</Text>}
+
               {item.parcelaAtual && (
                 <ParcelasItem>
                   {`${item?.parcelaAtual}/${item?.parcelaTotal}`}
@@ -333,6 +367,32 @@ export default App = () => {
                 }}
               />
             </View>
+
+            {
+              typeModal === 'saidas' && (
+                <View>
+                  <Text style={{color: '#000'}}>Cenários</Text>
+                  <Picker
+                    selectedValue={pickerSelect}
+                    onValueChange={(item) =>setPickerSelect(item)}
+                    style={{
+                      borderWidth: 0.5,
+                      borderColor: '#84E0FC',
+                      height: 40,
+                      width: 300,
+                      borderRadius: 5,
+                      marginBottom: 10,
+                      padding: 12,
+                    }}
+                  >
+                    <Picker.Item label="Prioridade baixa" value="1" />
+                    <Picker.Item label="Prioridade média" value="2" />
+                    <Picker.Item label="Prioridade alta" value="3" />
+                  </Picker>
+                </View>
+              )
+            }
+            
             <DatePicker
               current={format(new Date(), 'yyyy-MM-dd')}
               mode="calendar"
