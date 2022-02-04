@@ -5,16 +5,15 @@ import {getStatusBarHeight} from 'react-native-iphone-x-helper';
 
 export const MainView = styled.View`
   flex: 1;
-  flex-direction: column;
   align-items: center;
-  background-color: #fff;
+  background-color: ${({theme}) => theme.colors.background};
 `;
 
 export const Header = styled.View`
-  height: ${Platform.OS === 'ios' ? getStatusBarHeight() + 90 : 100}px;
+  height: ${Platform.OS === 'ios' ? getStatusBarHeight() + 100 : 130}px;
   width: 100%;
-  background-color: #23c1e3;
-  padding: 24px;
+  background-color: ${({theme}) => theme.colors.primary};
+  padding: 0 24px 30px;
   border-bottom-left-radius: 15px;
   border-bottom-right-radius: 15px;
   flex-direction: row;
@@ -29,13 +28,13 @@ export const DivTitle = styled.View`
 
 export const Title = styled.Text`
   font-size: 20px;
-  color: #000;
+  color: ${({theme}) => theme.colors.text};
 `;
 
 export const Name = styled.Text`
   font-size: 20px;
   font-weight: bold;
-  color: #000;
+  color: ${({theme}) => theme.colors.text};
 `;
 
 export const DivButtons = styled.View`
@@ -44,73 +43,15 @@ export const DivButtons = styled.View`
   justify-content: space-between;
   align-items: center;
   padding: 32px 24px;
-  background-color: #fff;
+  background-color: ${({theme}) => theme.colors.background};
 `;
 
-export const Button = styled.TouchableOpacity`
-  width: 105px;
-  height: 55px;
-  background-color: ${props =>
-    props.active ? props.colorActive : props.color};
-  border-radius: 4px;
-  justify-content: center;
-  align-items: center;
-  shadow-opacity: 0.2;
-  shadow-radius: 3px;
-  shadow-color: #000;
-  shadow-offset: 0px 4px;
-`;
-
-export const TextButton = styled.Text`
-  font-size: 16px;
-  color: #000;
-`;
-
-export const ItemContainer = styled.View`
-  width: 100%;
-  height: 81px;
-  flex-direction: column;
-  justify-content: space-between;
-  background-color: #fff;
-  shadow-opacity: 0.2;
-  shadow-radius: 3px;
-  shadow-color: #000;
-  shadow-offset: 0px 4px;
-  margin-bottom: 12px;
-  padding: 12px;
-`;
-
-export const TopContainerItem = styled.View`
-  width: 100%;
-  flex-direction: row;
-  justify-content: space-between;
-`;
-
-export const OrigemItem = styled.Text`
-  color: #000;
-  font-size: 16px;
-  font-weight: bold;
-`;
-
-export const TotalItem = styled.Text`
-  color: #000;
-  font-size: 14px;
-`;
-
-export const ValorItem = styled.Text`
-  color: #000;
-  font-size: 14px;
-`;
-
-export const ParcelasItem = styled.Text`
-  color: #000;
-  font-size: 14px;
-`;
-
-export const DataItem = styled.Text`
-  color: #000;
-  font-size: 14px;
-`;
+export const List = styled.FlatList.attrs({
+  width: '100%',
+  maxHeight: Platform.OS === 'ios' ? 300 : 250,
+  paddingHorizontal: 24,
+  showsVerticalScrollIndicator: false
+})``;
 
 export const DivTotal = styled.View`
   width: 100%;
@@ -120,38 +61,9 @@ export const DivTotal = styled.View`
 `;
 
 export const TotalText = styled.Text`
-  color: #000;
+  color: ${({theme}) => theme.colors.text};
   font-size: 18px;
   font-weight: bold;
-`;
-
-export const ViewSaldo = styled.View`
-  width: 325px;
-  height: 150px;
-  border-radius: 6px;
-  background-color: #23c1e3;
-  flex-direction: column;
-  justify-content: space-between;
-  align-items: center;
-  padding: 12px;
-`;
-
-export const TitleSaldo = styled.Text`
-  color: #000;
-  font-size: 18px;
-  font-weight: bold;
-`;
-
-export const DivSaldoText = styled.View`
-  width: 100%;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-`;
-
-export const SaldoText = styled.Text`
-  color: #000;
-  font-size: 14px;
 `;
 
 export const ButtonHover = styled.TouchableOpacity`
@@ -161,14 +73,14 @@ export const ButtonHover = styled.TouchableOpacity`
   width: 50px;
   height: 50px;
   border-radius: 25px;
-  background-color: rgba(2, 72, 174, 0.8);
+  background-color: ${({theme}) => theme.colors.secondary_light};
   justify-content: center;
   align-items: center;
   z-index: 999;
 `;
 
 export const ButtonIcon = styled.Text`
-  color: #fff;
+  color: ${({theme}) => theme.colors.shape};
   font-size: ${props => props.size};
 `;
 
@@ -176,7 +88,7 @@ export const DivActions = styled.View`
   position: absolute;
   bottom: 70px;
   right: 70px;
-  background-color: #fff;
+  background-color: ${({theme}) => theme.colors.background};
   border-radius: 10px;
   padding: 5px;
   width: 150px;
@@ -196,7 +108,7 @@ export const LinhaAction = styled.TouchableOpacity`
 `;
 
 export const LinhaActionText = styled.Text`
-  color: #000;
+  color: ${({theme}) => theme.colors.text};
   font-size: 16px;
 `;
 
@@ -207,7 +119,7 @@ export const ButtonClose = styled.TouchableOpacity`
   width: ${props => (props.size ? props.size : '30px')};
   height: ${props => (props.size ? props.size : '30px')};
   border-radius: 25px;
-  background-color: rgba(227, 35, 49, 0.8);
+  background-color: ${({ theme }) => theme.colors.close};
   justify-content: center;
   align-items: center;
   z-index: 999;

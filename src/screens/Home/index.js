@@ -1,24 +1,26 @@
 import React, {useState, useEffect} from 'react';
 import {
-  FlatList,
   Modal,
   View,
   StyleSheet,
   Text,
   Pressable,
+  Alert,
   TextInput,
-  StatusBar,
-  TouchableOpacity,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import CurrencyInput from 'react-native-currency-input';
-import {format} from 'date-fns';
 import DatePicker from 'react-native-modern-datepicker';
 import {Picker} from '@react-native-community/picker';
+import { useTheme } from 'styled-components';
+import {format} from 'date-fns';
 
-import Cenario1Svg from './src/assets/svg/cenario-1.svg';
-import Cenario2Svg from './src/assets/svg/cenario-2.svg';
-import Cenario3Svg from './src/assets/svg/cenario-3.svg';
+import UserSvg from '../../assets/svg/user.svg';
+import AddSvg from '../../assets/svg/iconAdd.svg';
+
+import { Button } from '../../components/Button';
+import { CardList } from '../../components/CardList';
+import { ViewSaldo } from '../../components/ViewSaldo';
 
 import {
   MainView,
@@ -27,21 +29,9 @@ import {
   Title,
   Name,
   DivButtons,
-  Button,
-  TextButton,
-  ItemContainer,
-  TopContainerItem,
-  OrigemItem,
-  TotalItem,
-  ValorItem,
-  ParcelasItem,
-  DataItem,
+  List,
   DivTotal,
   TotalText,
-  ViewSaldo,
-  TitleSaldo,
-  DivSaldoText,
-  SaldoText,
   ButtonHover,
   ButtonIcon,
   DivActions,
@@ -50,9 +40,11 @@ import {
   ButtonClose,
 } from './styles';
 
-import data from './data.json';
+import data from '../../database/data.json';
 
 export default App = () => {
+  const { colors } = useTheme();
+
   const [stateButton, setStateButton] = useState({
     entradas: true,
     saidas: false,
@@ -189,14 +181,25 @@ export default App = () => {
 
   async function handleRemoveItem(item) {
     if (stateButton.entradas) {
-      let dataToSave = (await AsyncStorage.getItem('entradas')) || '[]';
-      dataToSave = JSON.parse(dataToSave);
+      Alert.alert('Aviso','Deseja realmente excluir?', [
+        {
+          text: 'Não',
+          styles: 'cancel',
+        },
+        {
+          text: 'Sim',
+          onPress: async () => {
+            let dataToSave = (await AsyncStorage.getItem('entradas')) || '[]';
+            dataToSave = JSON.parse(dataToSave);
 
-      var newDataToSave = dataToSave.filter(element=>element.id !== item.id);
+            var newDataToSave = dataToSave.filter(element=>element.id !== item.id);
 
-      AsyncStorage.setItem('entradas', JSON.stringify(newDataToSave)).then(() => {
-        handleGetData();
-      });
+            AsyncStorage.setItem('entradas', JSON.stringify(newDataToSave)).then(() => {
+              handleGetData();
+            });
+          }
+        }
+      ])
     }
   }
 
@@ -208,47 +211,42 @@ export default App = () => {
   
   return (
     <MainView>
-      <StatusBar
-        barStyle="light-content"
-        backgroundColor="transparent"
-        translucent
-      />
       <Header>
         <DivTitle>
           <Title>Olá, </Title>
           <Name>Fulano!</Name>
         </DivTitle>
-        <Name>Icone</Name>
+        <UserSvg width={30} height={30}/>
       </Header>
+
       <DivButtons>
         <Button
+          title="Entradas"
+          colorActive={colors.entrada}
           active={stateButton.entradas}
-          colorActive="#23E375"
-          color={'rgba(35,227,117,0.3)'}
-          onPress={() => handleStateButton('entradas')}>
-          <TextButton>Entradas</TextButton>
-        </Button>
+          colorInactive={colors.entrada_light}
+          onPress={() => handleStateButton('entradas')}
+        />
+
         <Button
+          title="Saídas"
+          colorActive={colors.saida}
           active={stateButton.saidas}
-          colorActive="#E3D523"
-          color={'rgba(227,213,35,0.3)'}
-          onPress={() => handleStateButton('saidas')}>
-          <TextButton>Saídas</TextButton>
-        </Button>
+          colorInactive={colors.saida_light}
+          onPress={() => handleStateButton('saidas')}
+        />
+
         <Button
           active={stateButton.dividas}
-          colorActive="#E32331"
-          color={'rgba(227,35,49,0.3)'}
-          onPress={() => handleStateButton('dividas')}>
-          <TextButton>Dívidas</TextButton>
-        </Button>
+          colorActive={colors.divida}
+          colorInactive={colors.divida_light}
+          onPress={() => handleStateButton('dividas')}
+          title="Dívidas"
+          />
       </DivButtons>
-      <FlatList
-        style={{
-          width: '100%',
-          maxHeight: Platform.OS === 'ios' ? 300 : 250,
-          paddingHorizontal: 24,
-        }}
+
+      <List
+        keyExtractor={(_, index) => index}
         data={
           stateButton.entradas
             ? dadosEntradas
@@ -257,88 +255,52 @@ export default App = () => {
             : data.dividas
         }
         renderItem={({item}) => (
-          <TouchableOpacity onLongPress={()=> handleRemoveItem(item)}>
-            <ItemContainer>
-              <TopContainerItem>
-                <OrigemItem>{item.origem}</OrigemItem>
-                {stateButton.dividas && (
-                  <TotalItem>
-                    {new Intl.NumberFormat('pt-BR', {
-                      style: 'currency',
-                      currency: 'BRL',
-                    }).format(
-                      item.valor *
-                        (item.parcelaTotal - (item.parcelaAtual - 1)),
-                    )}
-                  </TotalItem>
-                )}
-              </TopContainerItem>
-              <TopContainerItem>
-                <ValorItem>
-                  {new Intl.NumberFormat('pt-BR', {
-                    style: 'currency',
-                    currency: 'BRL',
-                  }).format(item.valor)}
-                </ValorItem>
-
-                {item.cenario === '1' && <Cenario1Svg width={20} height={20}/> }
-                {item.cenario === '2' && <Cenario2Svg width={20} height={20}/> }
-                {item.cenario === '3' && <Cenario3Svg width={20} height={20}/> }
-
-                {item.parcelaAtual && (
-                  <ParcelasItem>
-                    {`${item?.parcelaAtual}/${item?.parcelaTotal}`}
-                  </ParcelasItem>
-                )}
-                <DataItem>{item.data}</DataItem>
-              </TopContainerItem>
-            </ItemContainer>
-          </TouchableOpacity>
+          <CardList 
+            data={item}
+            stateButton={stateButton}
+            onLongPress={() => handleRemoveItem(item)} 
+          />
         )}
-        keyExtractor={item => item.id}
-        showsVerticalScrollIndicator={false}
       />
+
       <DivTotal>
         <TotalText>Total</TotalText>
         <TotalText>{handleSum()}</TotalText>
       </DivTotal>
-      <ViewSaldo>
-        <TitleSaldo>Saldo</TitleSaldo>
-        <DivSaldoText>
-          <SaldoText>Saldo Geral</SaldoText>
-          <SaldoText>R$2.300,00</SaldoText>
-        </DivSaldoText>
-        <DivSaldoText>
-          <SaldoText>Saldo Hipotético 1</SaldoText>
-          <SaldoText>R$2.300,00</SaldoText>
-        </DivSaldoText>
-        <DivSaldoText>
-          <SaldoText>Saldo Hipotético 2</SaldoText>
-          <SaldoText>R$2.300,00</SaldoText>
-        </DivSaldoText>
-      </ViewSaldo>
-      <ButtonHover onPress={() => setShowActions(!showActions)}>
-        <ButtonIcon size="36px">+</ButtonIcon>
+
+      <ViewSaldo
+        saldoGeral={3500}
+        hipotético1={800}
+        hipotético2={1200}
+      />
+
+      <ButtonHover activeOpacity={0.6} onPress={() => setShowActions(!showActions)}>
+        <AddSvg width={20} height={20}/>
       </ButtonHover>
+
       {showActions && (
         <DivActions>
           <LinhaAction
-            color={'rgba(35,227,117,0.5)'}
+            activeOpacity={0.6}
+            color={colors.entrada_light}
             onPress={() => handleShowModal('entradas')}>
             <LinhaActionText>Nova Entrada</LinhaActionText>
           </LinhaAction>
           <LinhaAction
-            color={'rgba(227,213,35,0.5)'}
+            activeOpacity={0.6}
+            color={colors.saida_light}
             onPress={() => handleShowModal('saidas')}>
             <LinhaActionText>Nova Saída</LinhaActionText>
           </LinhaAction>
           <LinhaAction
-            color={'rgba(227,35,49,0.5)'}
+            activeOpacity={0.6}
+            color={colors.divida_light}
             onPress={() => handleShowModal('dividas')}>
             <LinhaActionText>Nova Dívida</LinhaActionText>
           </LinhaAction>
         </DivActions>
       )}
+      
       <Modal
         animationType="slide"
         transparent={true}
@@ -393,9 +355,6 @@ export default App = () => {
                 delimiter="."
                 separator=","
                 precision={2}
-                onChangeText={formattedValue => {
-                  console.log(formattedValue); // $2,310.46
-                }}
               />
             </View>
 
