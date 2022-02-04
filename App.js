@@ -7,6 +7,7 @@ import {
   Text,
   Pressable,
   TextInput,
+  StatusBar
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import CurrencyInput from 'react-native-currency-input';
@@ -100,7 +101,7 @@ export default App = () => {
   const handleSum = () => {
     let sum = 0;
     if (stateButton.entradas) {
-      for (let index = 0; index < dadosEntradas.length; index++) {
+      for (let index = 0; index < dadosEntradas?.length; index++) {
         const element = dadosEntradas[index];
         sum = sum + parseFloat(element.valor);
       }
@@ -155,29 +156,9 @@ export default App = () => {
     setShowModal(true);
   };
 
-  // getDatePicker = () => {
-  //   let datePicker = (
-
-  //   );
-
-  //   let dataString = format(date, 'dd/MM/yyyy');
-
-  //   if (Platform.OS === 'android') {
-  //     datePicker = (
-  //       <View>
-  //         <TouchableOpacity onPress={() => setShowDatePicker(true)}>
-  //           <Text style={styles.date}>{dataString}</Text>
-  //         </TouchableOpacity>
-  //         {showDatePicker && datePicker}
-  //       </View>
-  //     );
-  //   }
-
-  //   return datePicker;
-  // };
-
   return (
     <MainView>
+      <StatusBar barStyle='light-content' backgroundColor='transparent' translucent />
       <Header>
         <DivTitle>
           <Title>Olá, </Title>
@@ -211,7 +192,7 @@ export default App = () => {
       <FlatList
         style={{
           width: '100%',
-          maxHeight: 300,
+          maxHeight: Platform.OS === 'ios' ? 300 : 250,
           paddingHorizontal: 24,
         }}
         data={
@@ -314,7 +295,7 @@ export default App = () => {
                 : 'dívida'}
             </Text>
             <View>
-              <Text>Origem</Text>
+              <Text style={{color: '#000'}}>Origem</Text>
               <TextInput
                 style={{
                   borderWidth: 0.5,
@@ -330,7 +311,7 @@ export default App = () => {
               />
             </View>
             <View>
-              <Text>Valor</Text>
+              <Text style={{color: '#000'}}>Valor</Text>
               <CurrencyInput
                 style={{
                   borderWidth: 0.5,
@@ -415,6 +396,7 @@ const styles = StyleSheet.create({
     fontSize: 28,
     marginBottom: 15,
     textAlign: 'center',
+    color: '#000'
   },
   date: {
     fontSize: 20,
