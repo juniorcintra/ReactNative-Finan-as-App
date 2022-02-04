@@ -1,5 +1,17 @@
-import React, {useState} from 'react';
-import {FlatList} from 'react-native';
+import React, {useState, useEffect} from 'react';
+import {
+  FlatList,
+  Modal,
+  View,
+  StyleSheet,
+  Text,
+  Pressable,
+  TextInput,
+} from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import CurrencyInput from 'react-native-currency-input';
+import {format} from 'date-fns';
+import DatePicker from 'react-native-modern-datepicker';
 
 import {
   MainView,
@@ -19,6 +31,15 @@ import {
   DataItem,
   DivTotal,
   TotalText,
+  ViewSaldo,
+  TitleSaldo,
+  DivSaldoText,
+  SaldoText,
+  ButtonHover,
+  ButtonIcon,
+  DivActions,
+  LinhaAction,
+  LinhaActionText,
 } from './styles';
 
 import data from './data.json';
@@ -29,6 +50,26 @@ export default App = () => {
     saidas: false,
     dividas: false,
   });
+  const [showActions, setShowActions] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [typeModal, setTypeModal] = useState('');
+
+  const [valueInput, setValueInput] = useState(null);
+  const [origem, setOrigem] = useState();
+  const [date, setDate] = useState(new Date());
+
+  const [dadosEntradas, setDadosEntradas] = useState([]);
+
+  async function handleGetData() {
+    var dataEntradas = await AsyncStorage.getItem('entradas');
+    var entradas = JSON.parse(dataEntradas);
+
+    setDadosEntradas(entradas);
+  }
+
+  useEffect(() => {
+    handleGetData();
+  }, [showModal]);
 
   const handleStateButton = button => {
     switch (button) {
@@ -59,8 +100,8 @@ export default App = () => {
   const handleSum = () => {
     let sum = 0;
     if (stateButton.entradas) {
-      for (let index = 0; index < data.entradas.length; index++) {
-        const element = data.entradas[index];
+      for (let index = 0; index < dadosEntradas.length; index++) {
+        const element = dadosEntradas[index];
         sum = sum + parseFloat(element.valor);
       }
     }
@@ -84,6 +125,56 @@ export default App = () => {
       currency: 'BRL',
     }).format(sum);
   };
+
+  saveData = async () => {
+    try {
+      let dataEntradas = {
+        origem: origem,
+        valor: valueInput,
+        data: format(new Date(date), 'dd/MM/yyyy'),
+      };
+
+      if (typeModal === 'entradas') {
+        let dataToSave = (await AsyncStorage.getItem('entradas')) || '[]';
+        dataToSave = JSON.parse(dataToSave);
+        dataToSave.push(dataEntradas);
+        AsyncStorage.setItem('entradas', JSON.stringify(dataToSave)).then(
+          () => {
+            setShowModal(false);
+          },
+        );
+      }
+    } catch (error) {
+      alert(error);
+    }
+  };
+
+  const handleShowModal = type => {
+    setTypeModal(type);
+    setShowActions(false);
+    setShowModal(true);
+  };
+
+  // getDatePicker = () => {
+  //   let datePicker = (
+
+  //   );
+
+  //   let dataString = format(date, 'dd/MM/yyyy');
+
+  //   if (Platform.OS === 'android') {
+  //     datePicker = (
+  //       <View>
+  //         <TouchableOpacity onPress={() => setShowDatePicker(true)}>
+  //           <Text style={styles.date}>{dataString}</Text>
+  //         </TouchableOpacity>
+  //         {showDatePicker && datePicker}
+  //       </View>
+  //     );
+  //   }
+
+  //   return datePicker;
+  // };
 
   return (
     <MainView>
@@ -125,7 +216,7 @@ export default App = () => {
         }}
         data={
           stateButton.entradas
-            ? data.entradas
+            ? dadosEntradas
             : stateButton.saidas
             ? data.saidas
             : data.dividas
@@ -168,6 +259,165 @@ export default App = () => {
         <TotalText>Total</TotalText>
         <TotalText>{handleSum()}</TotalText>
       </DivTotal>
+      <ViewSaldo>
+        <TitleSaldo>Saldo</TitleSaldo>
+        <DivSaldoText>
+          <SaldoText>Saldo Geral</SaldoText>
+          <SaldoText>R$2.300,00</SaldoText>
+        </DivSaldoText>
+        <DivSaldoText>
+          <SaldoText>Saldo Hipotético 1</SaldoText>
+          <SaldoText>R$2.300,00</SaldoText>
+        </DivSaldoText>
+        <DivSaldoText>
+          <SaldoText>Saldo Hipotético 2</SaldoText>
+          <SaldoText>R$2.300,00</SaldoText>
+        </DivSaldoText>
+      </ViewSaldo>
+      <ButtonHover onPress={() => setShowActions(!showActions)}>
+        <ButtonIcon>+</ButtonIcon>
+      </ButtonHover>
+      {showActions && (
+        <DivActions>
+          <LinhaAction
+            color={'rgba(35,227,117,0.5)'}
+            onPress={() => handleShowModal('entradas')}>
+            <LinhaActionText>Nova Entrada</LinhaActionText>
+          </LinhaAction>
+          <LinhaAction
+            color={'rgba(227,213,35,0.5)'}
+            onPress={() => handleShowModal('saidas')}>
+            <LinhaActionText>Nova Saída</LinhaActionText>
+          </LinhaAction>
+          <LinhaAction
+            color={'rgba(227,35,49,0.5)'}
+            onPress={() => handleShowModal('dividas')}>
+            <LinhaActionText>Nova Dívida</LinhaActionText>
+          </LinhaAction>
+        </DivActions>
+      )}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={showModal}
+        onRequestClose={() => {
+          setShowModal(!showModal);
+        }}>
+        <View style={styles.centeredView}>
+          <View style={styles.modalView}>
+            <Text style={styles.modalText}>
+              Nova{' '}
+              {typeModal === 'entradas'
+                ? 'entrada'
+                : typeModal === 'saidas'
+                ? 'saída'
+                : 'dívida'}
+            </Text>
+            <View>
+              <Text>Origem</Text>
+              <TextInput
+                style={{
+                  borderWidth: 0.5,
+                  borderColor: '#84E0FC',
+                  height: 40,
+                  width: 300,
+                  borderRadius: 5,
+                  marginBottom: 10,
+                  padding: 12,
+                }}
+                onChangeText={setOrigem}
+                value={origem}
+              />
+            </View>
+            <View>
+              <Text>Valor</Text>
+              <CurrencyInput
+                style={{
+                  borderWidth: 0.5,
+                  borderColor: '#84E0FC',
+                  height: 40,
+                  width: 300,
+                  borderRadius: 5,
+                  marginBottom: 10,
+                  padding: 12,
+                }}
+                value={valueInput}
+                onChangeValue={setValueInput}
+                prefix="R$"
+                delimiter="."
+                separator=","
+                precision={2}
+                onChangeText={formattedValue => {
+                  console.log(formattedValue); // $2,310.46
+                }}
+              />
+            </View>
+            <DatePicker
+              current={format(new Date(), 'yyyy-MM-dd')}
+              mode="calendar"
+              minuteInterval={30}
+              style={{borderRadius: 10, width: 320}}
+              onSelectedChange={date => setDate(date)}
+            />
+
+            <Pressable
+              style={[styles.button, styles.buttonClose]}
+              onPress={() => saveData()}>
+              <Text style={styles.textStyle}>Cadastrar</Text>
+            </Pressable>
+          </View>
+        </View>
+      </Modal>
     </MainView>
   );
 };
+
+const styles = StyleSheet.create({
+  centeredView: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 22,
+    backgroundColor: 'rgba(0, 0, 0, 0.3)',
+  },
+  modalView: {
+    margin: 20,
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 20,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  button: {
+    borderRadius: 20,
+    padding: 10,
+    elevation: 2,
+  },
+  buttonOpen: {
+    backgroundColor: '#F194FF',
+  },
+  buttonClose: {
+    backgroundColor: '#2196F3',
+  },
+  textStyle: {
+    color: 'white',
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  modalText: {
+    fontSize: 28,
+    marginBottom: 15,
+    textAlign: 'center',
+  },
+  date: {
+    fontSize: 20,
+    marginLeft: 15,
+  },
+});
