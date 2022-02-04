@@ -7,7 +7,8 @@ import {
   Text,
   Pressable,
   TextInput,
-  StatusBar
+  StatusBar,
+  TouchableOpacity,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import CurrencyInput from 'react-native-currency-input';
@@ -46,6 +47,7 @@ import {
   DivActions,
   LinhaAction,
   LinhaActionText,
+  ButtonClose,
 } from './styles';
 
 import data from './data.json';
@@ -141,6 +143,7 @@ export default App = () => {
   saveData = async () => {
     try {
       let dataEntradas = {
+        id: Math.floor(Date.now() * Math.random()).toString(36),
         origem: origem,
         valor: valueInput,
         data: format(new Date(date), 'dd/MM/yyyy'),
@@ -178,7 +181,20 @@ export default App = () => {
       alert(error);
     }
   };
-  console.log(dadosSaidas)
+
+  async function handleRemoveItem(item) {
+    if (stateButton.entradas) {
+      let dataToSave = (await AsyncStorage.getItem('entradas')) || '[]';
+      dataToSave = JSON.parse(dataToSave);
+
+      var newDataToSave = dataToSave.filter(element=>element.id !== item.id);
+
+      AsyncStorage.setItem('entradas', JSON.stringify(newDataToSave)).then(() => {
+        handleGetData();
+      });
+    }
+  }
+
   const handleShowModal = type => {
     setTypeModal(type);
     setShowActions(false);
@@ -187,7 +203,11 @@ export default App = () => {
   
   return (
     <MainView>
-      <StatusBar barStyle='light-content' backgroundColor='transparent' translucent />
+      <StatusBar
+        barStyle="light-content"
+        backgroundColor="transparent"
+        translucent
+      />
       <Header>
         <DivTitle>
           <Title>Olá, </Title>
@@ -232,40 +252,38 @@ export default App = () => {
             : data.dividas
         }
         renderItem={({item}) => (
-          <ItemContainer>
-            <TopContainerItem>
-              <OrigemItem>{item.origem}</OrigemItem>
-              {stateButton.dividas && (
-                <TotalItem>
+          <TouchableOpacity onLongPress={()=> handleRemoveItem(item)}>
+            <ItemContainer>
+              <TopContainerItem>
+                <OrigemItem>{item.origem}</OrigemItem>
+                {stateButton.dividas && (
+                  <TotalItem>
+                    {new Intl.NumberFormat('pt-BR', {
+                      style: 'currency',
+                      currency: 'BRL',
+                    }).format(
+                      item.valor *
+                        (item.parcelaTotal - (item.parcelaAtual - 1)),
+                    )}
+                  </TotalItem>
+                )}
+              </TopContainerItem>
+              <TopContainerItem>
+                <ValorItem>
                   {new Intl.NumberFormat('pt-BR', {
                     style: 'currency',
                     currency: 'BRL',
-                  }).format(
-                    item.valor * (item.parcelaTotal - (item.parcelaAtual - 1)),
-                  )}
-                </TotalItem>
-              )}
-            </TopContainerItem>
-            <TopContainerItem>
-              <ValorItem>
-                {new Intl.NumberFormat('pt-BR', {
-                  style: 'currency',
-                  currency: 'BRL',
-                }).format(item.valor)}
-              </ValorItem>
-              
-              {item.cenario === '1' && <Text>Teste1</Text> }
-              {item.cenario === '2' && <Text>Teste2</Text>}
-              {item.cenario === '3' && <Text>Teste3</Text>}
-
-              {item.parcelaAtual && (
-                <ParcelasItem>
-                  {`${item?.parcelaAtual}/${item?.parcelaTotal}`}
-                </ParcelasItem>
-              )}
-              <DataItem>{item.data}</DataItem>
-            </TopContainerItem>
-          </ItemContainer>
+                  }).format(item.valor)}
+                </ValorItem>
+                {item.parcelaAtual && (
+                  <ParcelasItem>
+                    {`${item?.parcelaAtual}/${item?.parcelaTotal}`}
+                  </ParcelasItem>
+                )}
+                <DataItem>{item.data}</DataItem>
+              </TopContainerItem>
+            </ItemContainer>
+          </TouchableOpacity>
         )}
         keyExtractor={item => item.id}
         showsVerticalScrollIndicator={false}
@@ -290,7 +308,7 @@ export default App = () => {
         </DivSaldoText>
       </ViewSaldo>
       <ButtonHover onPress={() => setShowActions(!showActions)}>
-        <ButtonIcon>+</ButtonIcon>
+        <ButtonIcon size="36px">+</ButtonIcon>
       </ButtonHover>
       {showActions && (
         <DivActions>
@@ -320,6 +338,9 @@ export default App = () => {
         }}>
         <View style={styles.centeredView}>
           <View style={styles.modalView}>
+            <ButtonClose onPress={() => setShowModal(!showModal)}>
+              <ButtonIcon size="24px">X</ButtonIcon>
+            </ButtonClose>
             <Text style={styles.modalText}>
               Nova{' '}
               {typeModal === 'entradas'
@@ -456,7 +477,7 @@ const styles = StyleSheet.create({
     fontSize: 28,
     marginBottom: 15,
     textAlign: 'center',
-    color: '#000'
+    color: '#000',
   },
   date: {
     fontSize: 20,
