@@ -280,6 +280,11 @@ export default App = () => {
                     currency: 'BRL',
                   }).format(item.valor)}
                 </ValorItem>
+
+                {item.cenario === '1' && <Cenario1Svg width={20} height={20}/> }
+                {item.cenario === '2' && <Cenario2Svg width={20} height={20}/> }
+                {item.cenario === '3' && <Cenario3Svg width={20} height={20}/> }
+
                 {item.parcelaAtual && (
                   <ParcelasItem>
                     {`${item?.parcelaAtual}/${item?.parcelaTotal}`}
