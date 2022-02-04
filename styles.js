@@ -1,6 +1,9 @@
 import styled from 'styled-components/native';
+import {Platform} from 'react-native';
 
 import {getStatusBarHeight} from 'react-native-iphone-x-helper';
+
+
 
 export const MainView = styled.View`
   flex: 1;
@@ -10,7 +13,7 @@ export const MainView = styled.View`
 `;
 
 export const Header = styled.View`
-  height: ${getStatusBarHeight() + 90}px;
+  height: ${Platform.OS === 'ios' ? getStatusBarHeight() + 90 : 100}px;
   width: 100%;
   background-color: #23c1e3;
   padding: 24px;
