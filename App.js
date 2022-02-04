@@ -145,6 +145,11 @@ export default App = () => {
         AsyncStorage.setItem('entradas', JSON.stringify(dataToSave)).then(
           () => {
             setShowModal(false);
+            setStateButton({
+              entradas: true,
+              saidas: false,
+              dividas: false,
+            });
           },
         );
       }
