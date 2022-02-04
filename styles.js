@@ -3,8 +3,6 @@ import {Platform} from 'react-native';
 
 import {getStatusBarHeight} from 'react-native-iphone-x-helper';
 
-
-
 export const MainView = styled.View`
   flex: 1;
   flex-direction: column;
@@ -171,7 +169,7 @@ export const ButtonHover = styled.TouchableOpacity`
 
 export const ButtonIcon = styled.Text`
   color: #fff;
-  font-size: 36px;
+  font-size: ${props => props.size};
 `;
 
 export const DivActions = styled.View`
@@ -182,7 +180,7 @@ export const DivActions = styled.View`
   border-radius: 10px;
   padding: 5px;
   width: 150px;
-  height: 120px;  
+  height: 120px;
   flex-direction: column;
   justify-content: space-around;
   align-items: center;
@@ -200,4 +198,17 @@ export const LinhaAction = styled.TouchableOpacity`
 export const LinhaActionText = styled.Text`
   color: #000;
   font-size: 16px;
+`;
+
+export const ButtonClose = styled.TouchableOpacity`
+  position: absolute;
+  right: -10px;
+  top: -10px;
+  width: 30px;
+  height: 30px;
+  border-radius: 25px;
+  background-color: rgba(227, 35, 49, 0.8);
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
 `;

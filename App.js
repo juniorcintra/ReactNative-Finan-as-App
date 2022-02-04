@@ -41,6 +41,7 @@ import {
   DivActions,
   LinhaAction,
   LinhaActionText,
+  ButtonClose
 } from './styles';
 
 import data from './data.json';
@@ -158,7 +159,11 @@ export default App = () => {
 
   return (
     <MainView>
-      <StatusBar barStyle='light-content' backgroundColor='transparent' translucent />
+      <StatusBar
+        barStyle="light-content"
+        backgroundColor="transparent"
+        translucent
+      />
       <Header>
         <DivTitle>
           <Title>Olá, </Title>
@@ -256,7 +261,7 @@ export default App = () => {
         </DivSaldoText>
       </ViewSaldo>
       <ButtonHover onPress={() => setShowActions(!showActions)}>
-        <ButtonIcon>+</ButtonIcon>
+        <ButtonIcon size="36px">+</ButtonIcon>
       </ButtonHover>
       {showActions && (
         <DivActions>
@@ -286,6 +291,9 @@ export default App = () => {
         }}>
         <View style={styles.centeredView}>
           <View style={styles.modalView}>
+            <ButtonClose onPress={() => setShowModal(!showModal)}>
+              <ButtonIcon  size="24px">X</ButtonIcon>
+            </ButtonClose>
             <Text style={styles.modalText}>
               Nova{' '}
               {typeModal === 'entradas'
