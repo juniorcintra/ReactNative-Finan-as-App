@@ -202,10 +202,10 @@ export const LinhaActionText = styled.Text`
 
 export const ButtonClose = styled.TouchableOpacity`
   position: absolute;
-  right: -10px;
-  top: -10px;
-  width: 30px;
-  height: 30px;
+  right: ${props => (props.mode === "item" ? '-5px' : '-10px')};
+  top: ${props => (props.mode === "item" ? '-5px' : '-10px')};
+  width: ${props => (props.size ? props.size : '30px')};
+  height: ${props => (props.size ? props.size : '30px')};
   border-radius: 25px;
   background-color: rgba(227, 35, 49, 0.8);
   justify-content: center;
