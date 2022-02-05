@@ -3,7 +3,7 @@ import {Platform} from 'react-native';
 
 import {getStatusBarHeight} from 'react-native-iphone-x-helper';
 
-export const MainView = styled.View`
+export const MainView = styled.SafeAreaView`
   flex: 1;
   flex-direction: column;
   align-items: center;
@@ -78,6 +78,9 @@ export const ItemContainer = styled.View`
   shadow-offset: 0px 4px;
   margin-bottom: 12px;
   padding: 12px;
+  border-width: 1px;
+  border-color: #ccc;
+  border-radius: 5px;
 `;
 
 export const TopContainerItem = styled.View`

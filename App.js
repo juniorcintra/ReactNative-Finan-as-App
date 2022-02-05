@@ -63,7 +63,7 @@ export default App = () => {
   const [typeModal, setTypeModal] = useState('');
 
   const [valueInput, setValueInput] = useState(null);
-  const [origem, setOrigem] = useState();
+  const [origem, setOrigem] = useState('');
   const [date, setDate] = useState(new Date());
   const [pickerSelect, setPickerSelect] = useState('');
 
@@ -78,7 +78,7 @@ export default App = () => {
     var saidas = JSON.parse(dataSaidas);
 
     setDadosEntradas(entradas);
-    setDadosSaidas(saidas)
+    setDadosSaidas(saidas);
   }
 
   useEffect(() => {
@@ -153,7 +153,7 @@ export default App = () => {
         origem: origem,
         valor: valueInput,
         data: format(new Date(date), 'dd/MM/yyyy'),
-        cenario: pickerSelect
+        cenario: pickerSelect,
       };
 
       if (typeModal === 'entradas') {
@@ -162,7 +162,7 @@ export default App = () => {
         dataToSave.push(dataEntradas);
         AsyncStorage.setItem('entradas', JSON.stringify(dataToSave)).then(
           () => {
-            setShowModal(false);
+            handleCloseModal();
             setStateButton({
               entradas: true,
               saidas: false,
@@ -176,12 +176,17 @@ export default App = () => {
         let dataToSave = (await AsyncStorage.getItem('saidas')) || '[]';
         dataToSave = JSON.parse(dataToSave);
         dataToSave.push(dataSaidas);
-        AsyncStorage.setItem('saidas', JSON.stringify(dataToSave)).then(
-          () => {
-            setShowModal(false);
-          },
-        );
+        AsyncStorage.setItem('saidas', JSON.stringify(dataToSave)).then(() => {
+          handleCloseModal();
+          setStateButton({
+            entradas: false,
+            saidas: true,
+            dividas: false,
+          });
+        });
       }
+
+      
     } catch (error) {
       alert(error);
     }
@@ -192,20 +197,29 @@ export default App = () => {
       let dataToSave = (await AsyncStorage.getItem('entradas')) || '[]';
       dataToSave = JSON.parse(dataToSave);
 
-      var newDataToSave = dataToSave.filter(element=>element.id !== item.id);
+      var newDataToSave = dataToSave.filter(element => element.id !== item.id);
 
-      AsyncStorage.setItem('entradas', JSON.stringify(newDataToSave)).then(() => {
-        handleGetData();
-      });
+      AsyncStorage.setItem('entradas', JSON.stringify(newDataToSave)).then(
+        () => {
+          handleGetData();
+        },
+      );
     }
   }
+
+  const handleCloseModal = () => {
+    setShowModal(false);
+    setValueInput(null);
+    setOrigem('');
+    setPickerSelect('');
+  };
 
   const handleShowModal = type => {
     setTypeModal(type);
     setShowActions(false);
     setShowModal(true);
   };
-  
+
   return (
     <MainView>
       <StatusBar
@@ -257,7 +271,7 @@ export default App = () => {
             : data.dividas
         }
         renderItem={({item}) => (
-          <TouchableOpacity onLongPress={()=> handleRemoveItem(item)}>
+          <TouchableOpacity onLongPress={() => handleRemoveItem(item)}>
             <ItemContainer>
               <TopContainerItem>
                 <OrigemItem>{item.origem}</OrigemItem>
@@ -281,9 +295,9 @@ export default App = () => {
                   }).format(item.valor)}
                 </ValorItem>
 
-                {item.cenario === '1' && <Cenario1Svg width={20} height={20}/> }
-                {item.cenario === '2' && <Cenario2Svg width={20} height={20}/> }
-                {item.cenario === '3' && <Cenario3Svg width={20} height={20}/> }
+                {item.cenario === '1' && <Cenario1Svg width={20} height={20} />}
+                {item.cenario === '2' && <Cenario2Svg width={20} height={20} />}
+                {item.cenario === '3' && <Cenario3Svg width={20} height={20} />}
 
                 {item.parcelaAtual && (
                   <ParcelasItem>
@@ -348,7 +362,7 @@ export default App = () => {
         }}>
         <View style={styles.centeredView}>
           <View style={styles.modalView}>
-            <ButtonClose onPress={() => setShowModal(!showModal)}>
+            <ButtonClose onPress={() => handleCloseModal()}>
               <ButtonIcon size="24px">X</ButtonIcon>
             </ButtonClose>
             <Text style={styles.modalText}>
@@ -370,6 +384,7 @@ export default App = () => {
                   borderRadius: 5,
                   marginBottom: 10,
                   padding: 12,
+                  color: '#000',
                 }}
                 onChangeText={setOrigem}
                 value={origem}
@@ -386,6 +401,7 @@ export default App = () => {
                   borderRadius: 5,
                   marginBottom: 10,
                   padding: 12,
+                  color: `#000`,
                 }}
                 value={valueInput}
                 onChangeValue={setValueInput}
@@ -399,31 +415,29 @@ export default App = () => {
               />
             </View>
 
-            {
-              typeModal === 'saidas' && (
-                <View>
-                  <Text style={{color: '#000'}}>Cenários</Text>
-                  <Picker
-                    selectedValue={pickerSelect}
-                    onValueChange={(item) =>setPickerSelect(item)}
-                    style={{
-                      borderWidth: 0.5,
-                      borderColor: '#84E0FC',
-                      height: 40,
-                      width: 300,
-                      borderRadius: 5,
-                      marginBottom: 10,
-                      padding: 12,
-                    }}
-                  >
-                    <Picker.Item label="Prioridade baixa" value="1" />
-                    <Picker.Item label="Prioridade média" value="2" />
-                    <Picker.Item label="Prioridade alta" value="3" />
-                  </Picker>
-                </View>
-              )
-            }
-            
+            {typeModal === 'saidas' && (
+              <View>
+                <Text style={{color: '#000'}}>Cenários</Text>
+                <Picker
+                  selectedValue={pickerSelect}
+                  onValueChange={item => setPickerSelect(item)}
+                  style={{
+                    borderWidth: 0.5,
+                    borderColor: '#84E0FC',
+                    height: 40,
+                    width: 300,
+                    borderRadius: 5,
+                    marginBottom: 10,
+                    padding: 12,
+                    color: '#000',
+                  }}>
+                  <Picker.Item label="Prioridade baixa" value="1" />
+                  <Picker.Item label="Prioridade média" value="2" />
+                  <Picker.Item label="Prioridade alta" value="3" />
+                </Picker>
+              </View>
+            )}
+
             <DatePicker
               current={format(new Date(), 'yyyy-MM-dd')}
               mode="calendar"
