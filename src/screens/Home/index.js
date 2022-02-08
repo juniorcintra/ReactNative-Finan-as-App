@@ -12,15 +12,15 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import CurrencyInput from 'react-native-currency-input';
 import DatePicker from 'react-native-modern-datepicker';
 import {Picker} from '@react-native-community/picker';
-import { useTheme } from 'styled-components';
+import {useTheme} from 'styled-components';
 import {format} from 'date-fns';
 
 import UserSvg from '../../assets/svg/user.svg';
 import AddSvg from '../../assets/svg/iconAdd.svg';
 
-import { Button } from '../../components/Button';
-import { CardList } from '../../components/CardList';
-import { ViewSaldo } from '../../components/ViewSaldo';
+import {Button} from '../../components/Button';
+import {CardList} from '../../components/CardList';
+import {ViewSaldo} from '../../components/ViewSaldo';
 
 import {
   MainView,
@@ -43,7 +43,7 @@ import {
 import data from '../../database/data.json';
 
 export default App = () => {
-  const { colors } = useTheme();
+  const {colors} = useTheme();
 
   const [stateButton, setStateButton] = useState({
     entradas: true,
@@ -177,8 +177,6 @@ export default App = () => {
           });
         });
       }
-
-      
     } catch (error) {
       alert(error);
     }
@@ -186,7 +184,7 @@ export default App = () => {
 
   async function handleRemoveItem(item) {
     if (stateButton.entradas) {
-      Alert.alert('Aviso','Deseja realmente excluir?', [
+      Alert.alert('Aviso', 'Deseja realmente excluir?', [
         {
           text: 'Não',
           styles: 'cancel',
@@ -197,13 +195,19 @@ export default App = () => {
             let dataToSave = (await AsyncStorage.getItem('entradas')) || '[]';
             dataToSave = JSON.parse(dataToSave);
 
-      var newDataToSave = dataToSave.filter(element => element.id !== item.id);
+            var newDataToSave = dataToSave.filter(
+              element => element.id !== item.id,
+            );
 
-      AsyncStorage.setItem('entradas', JSON.stringify(newDataToSave)).then(
-        () => {
-          handleGetData();
+            AsyncStorage.setItem(
+              'entradas',
+              JSON.stringify(newDataToSave),
+            ).then(() => {
+              handleGetData();
+            });
+          },
         },
-      );
+      ]);
     }
   }
 
@@ -227,7 +231,7 @@ export default App = () => {
           <Title>Olá, </Title>
           <Name>Fulano!</Name>
         </DivTitle>
-        <UserSvg width={30} height={30}/>
+        <UserSvg width={30} height={30} />
       </Header>
 
       <DivButtons>
@@ -253,7 +257,7 @@ export default App = () => {
           colorInactive={colors.divida_light}
           onPress={() => handleStateButton('dividas')}
           title="Dívidas"
-          />
+        />
       </DivButtons>
 
       <List
@@ -266,10 +270,10 @@ export default App = () => {
             : data.dividas
         }
         renderItem={({item}) => (
-          <CardList 
+          <CardList
             data={item}
             stateButton={stateButton}
-            onLongPress={() => handleRemoveItem(item)} 
+            onLongPress={() => handleRemoveItem(item)}
           />
         )}
       />
@@ -279,14 +283,12 @@ export default App = () => {
         <TotalText>{handleSum()}</TotalText>
       </DivTotal>
 
-      <ViewSaldo
-        saldoGeral={3500}
-        hipotético1={800}
-        hipotético2={1200}
-      />
+      <ViewSaldo saldoGeral={3500} hipotético1={800} hipotético2={1200} />
 
-      <ButtonHover activeOpacity={0.6} onPress={() => setShowActions(!showActions)}>
-        <AddSvg width={20} height={20}/>
+      <ButtonHover
+        activeOpacity={0.6}
+        onPress={() => setShowActions(!showActions)}>
+        <AddSvg width={20} height={20} />
       </ButtonHover>
 
       {showActions && (
@@ -311,7 +313,7 @@ export default App = () => {
           </LinhaAction>
         </DivActions>
       )}
-      
+
       <Modal
         animationType="slide"
         transparent={true}
