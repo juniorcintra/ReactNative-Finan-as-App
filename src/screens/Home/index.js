@@ -7,6 +7,7 @@ import {
   Pressable,
   Alert,
   TextInput,
+  ScrollView,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import CurrencyInput from 'react-native-currency-input';
@@ -17,6 +18,8 @@ import {format} from 'date-fns';
 
 import UserSvg from '../../assets/svg/user.svg';
 import AddSvg from '../../assets/svg/iconAdd.svg';
+import ArrowLeft from '../../assets/svg/arrowLeft.svg';
+import ArrowRight from '../../assets/svg/arrowRight.svg';
 
 import {Button} from '../../components/Button';
 import {CardList} from '../../components/CardList';
@@ -31,7 +34,10 @@ import {
   DivButtons,
   List,
   DivTotal,
+  WrapperViewSaldo,
   TotalText,
+  ArrowContainer,
+  Label,
   ButtonHover,
   ButtonIcon,
   DivActions,
@@ -39,8 +45,6 @@ import {
   LinhaActionText,
   ButtonClose,
 } from './styles';
-
-import data from '../../database/data.json';
 
 export default App = () => {
   const {colors} = useTheme();
@@ -54,13 +58,24 @@ export default App = () => {
   const [showModal, setShowModal] = useState(false);
   const [typeModal, setTypeModal] = useState('');
 
-  const [valueInput, setValueInput] = useState(null);
   const [origem, setOrigem] = useState('');
   const [date, setDate] = useState(new Date());
-  const [pickerSelect, setPickerSelect] = useState('');
+  const [valueInput, setValueInput] = useState(null);
+  const [parcelaAtual, setParcelaAtual] = useState(0);
+  const [parcelaTotal, setParcelaTotal] = useState(0);
+  const [pickerSelect, setPickerSelect] = useState('0');
 
   const [dadosEntradas, setDadosEntradas] = useState([]);
   const [dadosSaidas, setDadosSaidas] = useState([]);
+  const [dadosDividas, setDadosDividas] = useState([]);
+
+  const [cenarioEntradaUm, setCenarioEntradaUm] = useState(0);
+  const [cenarioSaidaUm, setCenarioSaidaUm] = useState(0);
+  const [cenarioDividaUm, setCenarioDividaUm] = useState(0);
+
+  const [cenarioDividaDois, setCenarioDividaDois] = useState(0);
+  const [cenarioSaidaDois, setCenarioSaidaDois] = useState(0);
+  const [cenarioEntradaDois, setCenarioEntradaDois] = useState(0);
 
   async function handleGetData() {
     var dataEntradas = await AsyncStorage.getItem('entradas');
@@ -69,13 +84,13 @@ export default App = () => {
     var dataSaidas = await AsyncStorage.getItem('saidas');
     var saidas = JSON.parse(dataSaidas);
 
+    var dataDividas = await AsyncStorage.getItem('dividas');
+    var dividas = JSON.parse(dataDividas);
+
     setDadosEntradas(entradas);
     setDadosSaidas(saidas);
+    setDadosDividas(dividas);
   }
-
-  useEffect(() => {
-    handleGetData();
-  }, [showModal]);
 
   const handleStateButton = button => {
     switch (button) {
@@ -112,17 +127,10 @@ export default App = () => {
       }
     }
 
-    if (stateButton.saidas) {
-      for (let index = 0; index < data.saidas.length; index++) {
-        const element = data.saidas[index];
-        sum = sum + parseFloat(element.valor);
-      }
-    }
-
     if (stateButton.dividas) {
-      for (let index = 0; index < data.dividas.length; index++) {
-        const element = data.dividas[index];
-        sum = sum + parseFloat(element.valor);
+      for (let index = 0; index < dadosDividas?.length; index++) {
+        const element = dadosDividas[index];
+        sum = sum + parseFloat(element.valor * (element.parcelaTotal - (element.parcelaAtual - 1)));
       }
     }
 
@@ -142,13 +150,27 @@ export default App = () => {
       };
 
       let dataSaidas = {
+        id: Math.floor(Date.now() * Math.random()).toString(36),
         origem: origem,
         valor: valueInput,
         data: format(new Date(date), 'dd/MM/yyyy'),
         cenario: pickerSelect,
       };
 
+      let dataDividas = {
+        id: Math.floor(Date.now() * Math.random()).toString(36),
+        origem: origem,
+        valor: valueInput,
+        data: format(new Date(date), 'dd/MM/yyyy'),
+        parcelaAtual: parcelaAtual,
+        parcelaTotal: parcelaTotal,
+        cenario: pickerSelect,
+      };
+
       if (typeModal === 'entradas') {
+        if (!origem) return;
+        if (!valueInput) return;
+
         let dataToSave = (await AsyncStorage.getItem('entradas')) || '[]';
         dataToSave = JSON.parse(dataToSave);
         dataToSave.push(dataEntradas);
@@ -165,6 +187,10 @@ export default App = () => {
       }
 
       if (typeModal === 'saidas') {
+        if (!origem) return;
+        if (!valueInput) return;
+        if (pickerSelect === '0') return;
+
         let dataToSave = (await AsyncStorage.getItem('saidas')) || '[]';
         dataToSave = JSON.parse(dataToSave);
         dataToSave.push(dataSaidas);
@@ -177,12 +203,33 @@ export default App = () => {
           });
         });
       }
+
+      if (typeModal === 'dividas') {
+        if (!origem) return;
+        if (!valueInput) return;
+        if (!parcelaAtual) return;
+        if (!parcelaTotal) return;
+        if (pickerSelect === '0') return;
+
+        let dataToSave = (await AsyncStorage.getItem('dividas')) || '[]';
+        dataToSave = JSON.parse(dataToSave);
+        dataToSave.push(dataDividas);
+        AsyncStorage.setItem('dividas', JSON.stringify(dataToSave)).then(() => {
+          handleCloseModal();
+          setStateButton({
+            entradas: false,
+            saidas: false,
+            dividas: true,
+          });
+        });
+      }
     } catch (error) {
       alert(error);
     }
   };
 
   async function handleRemoveItem(item) {
+    //remover o card de entrada
     if (stateButton.entradas) {
       Alert.alert('Aviso', 'Deseja realmente excluir?', [
         {
@@ -209,13 +256,73 @@ export default App = () => {
         },
       ]);
     }
+    //remover o card de saida
+    if (stateButton.saidas) {
+      Alert.alert('Aviso', 'Deseja realmente excluir?', [
+        {
+          text: 'Não',
+          styles: 'cancel',
+        },
+        {
+          text: 'Sim',
+          onPress: async () => {
+            let dataToSave = (await AsyncStorage.getItem('saidas')) || '[]';
+            dataToSave = JSON.parse(dataToSave);
+
+            var newDataToSave = dataToSave.filter(
+              element => element.id !== item.id,
+            );
+
+            AsyncStorage.setItem(
+              'saidas',
+              JSON.stringify(newDataToSave),
+            ).then(() => {
+              handleGetData();
+            });
+          },
+        },
+      ]);
+    }
+    //remover o card de divida
+    if (stateButton.dividas) {
+      Alert.alert('Aviso', 'Deseja realmente excluir?', [
+        {
+          text: 'Não',
+          styles: 'cancel',
+        },
+        {
+          text: 'Sim',
+          onPress: async () => {
+            let dataToSave = (await AsyncStorage.getItem('dividas')) || '[]';
+            dataToSave = JSON.parse(dataToSave);
+
+            var newDataToSave = dataToSave.filter(
+              element => element.id !== item.id,
+            );
+
+            AsyncStorage.setItem(
+              'dividas',
+              JSON.stringify(newDataToSave),
+            ).then(() => {
+              handleGetData();
+            });
+          },
+        },
+      ]);
+    }
+  }
+
+  function handleSaldo() {
+    
   }
 
   const handleCloseModal = () => {
     setShowModal(false);
     setValueInput(null);
     setOrigem('');
-    setPickerSelect('');
+    setPickerSelect('0');
+    setParcelaAtual(0)
+    setParcelaTotal(0)
   };
 
   const handleShowModal = type => {
@@ -223,6 +330,11 @@ export default App = () => {
     setShowActions(false);
     setShowModal(true);
   };
+
+  useEffect(() => {
+    handleGetData();
+    handleSaldo();
+  }, [showModal]);
 
   return (
     <MainView>
@@ -267,7 +379,7 @@ export default App = () => {
             ? dadosEntradas
             : stateButton.saidas
             ? dadosSaidas
-            : data.dividas
+            : dadosDividas
         }
         renderItem={({item}) => (
           <CardList
@@ -279,11 +391,40 @@ export default App = () => {
       />
 
       <DivTotal>
-        <TotalText>Total</TotalText>
-        <TotalText>{handleSum()}</TotalText>
+        {!stateButton.saidas ? (
+          <>
+            <TotalText>Total</TotalText>
+            <TotalText>{handleSum()}</TotalText>
+          </>
+        ): <TotalText/>}
       </DivTotal>
+      
+      <WrapperViewSaldo>
+        <ViewSaldo
+          title="Saldo geral"
+          saldoGeral={3500} 
+          hipotético1={800} 
+          hipotético2={1200} 
+        />
+        <ViewSaldo
+          title="Total de saídas"
+          saldoGeral={3500} 
+          hipotético1={800} 
+          hipotético2={1200} 
+        />
+        <ViewSaldo
+          title="Total de dividas"
+          saldoGeral={3500} 
+          hipotético1={800} 
+          hipotético2={1200} 
+        />
+      </WrapperViewSaldo>
 
-      <ViewSaldo saldoGeral={3500} hipotético1={800} hipotético2={1200} />
+      <ArrowContainer>
+        <ArrowLeft width={20} height={20}/>
+        <Label>Arraste para o lado</Label>
+        <ArrowRight width={20} height={20}/>
+      </ArrowContainer>
 
       <ButtonHover
         activeOpacity={0.6}
@@ -326,6 +467,7 @@ export default App = () => {
             <ButtonClose onPress={() => handleCloseModal()}>
               <ButtonIcon size="24px">X</ButtonIcon>
             </ButtonClose>
+
             <Text style={styles.modalText}>
               Nova{' '}
               {typeModal === 'entradas'
@@ -334,76 +476,118 @@ export default App = () => {
                 ? 'saída'
                 : 'dívida'}
             </Text>
-            <View>
-              <Text style={{color: '#000'}}>Origem</Text>
-              <TextInput
-                style={{
-                  borderWidth: 0.5,
-                  borderColor: '#84E0FC',
-                  height: 40,
-                  width: 300,
-                  borderRadius: 5,
-                  marginBottom: 10,
-                  padding: 12,
-                  color: '#000',
-                }}
-                onChangeText={setOrigem}
-                value={origem}
-              />
-            </View>
-            <View>
-              <Text style={{color: '#000'}}>Valor</Text>
-              <CurrencyInput
-                style={{
-                  borderWidth: 0.5,
-                  borderColor: '#84E0FC',
-                  height: 40,
-                  width: 300,
-                  borderRadius: 5,
-                  marginBottom: 10,
-                  padding: 12,
-                  color: `#000`,
-                }}
-                value={valueInput}
-                onChangeValue={setValueInput}
-                prefix="R$"
-                delimiter="."
-                separator=","
-                precision={2}
-              />
-            </View>
 
-            {typeModal === 'saidas' && (
+            <ScrollView showsVerticalScrollIndicator={false}>
               <View>
-                <Text style={{color: '#000'}}>Cenários</Text>
-                <Picker
-                  selectedValue={pickerSelect}
-                  onValueChange={item => setPickerSelect(item)}
+                <Text style={{color: '#000'}}>Origem</Text>
+                <TextInput
                   style={{
                     borderWidth: 0.5,
                     borderColor: '#84E0FC',
                     height: 40,
                     width: 300,
-                    borderRadius: 5,
+                    borderRadius: 4,
                     marginBottom: 10,
                     padding: 12,
                     color: '#000',
-                  }}>
-                  <Picker.Item label="Prioridade baixa" value="1" />
-                  <Picker.Item label="Prioridade média" value="2" />
-                  <Picker.Item label="Prioridade alta" value="3" />
-                </Picker>
+                  }}
+                  onChangeText={setOrigem}
+                  value={origem}
+                />
               </View>
-            )}
+                
+              {typeModal === 'dividas' && (
+                <View style={{ flexDirection: 'row', width: 300, justifyContent: 'space-between' }}>
+                  <View style={{width: '45%'}}>
+                  <Text style={{color: '#000'}}>Parcela Atual</Text>
+                  <TextInput
+                    style={{
+                      borderWidth: 0.5,
+                      borderColor: '#84E0FC',
+                      height: 40,
+                      borderRadius: 4,
+                      marginBottom: 10,
+                      padding: 12,
+                      color: '#000',
+                    }}
+                    onChangeText={setParcelaAtual}
+                    value={parcelaAtual}
+                  />
+                  </View >
+                    <View style={{width: '45%'}}>
+                    <Text style={{color: '#000'}}>Total de Parcela</Text>
+                    <TextInput
+                      style={{
+                        borderWidth: 0.5,
+                        borderColor: '#84E0FC',
+                        height: 40,
+                        borderRadius: 4,
+                        marginBottom: 10,
+                        padding: 12,
+                        color: '#000',
+                      }}
+                      onChangeText={setParcelaTotal}
+                      value={parcelaTotal}
+                    />
+                  </View>
+                </View>
+              )}
 
-            <DatePicker
-              current={format(new Date(), 'yyyy-MM-dd')}
-              mode="calendar"
-              minuteInterval={30}
-              style={{borderRadius: 10, width: 320}}
-              onSelectedChange={date => setDate(date)}
-            />
+              <View>
+                <Text style={{color: '#000'}}>Valor</Text>
+                <CurrencyInput
+                  style={{
+                    borderWidth: 0.5,
+                    borderColor: '#84E0FC',
+                    height: 40,
+                    width: 300,
+                    borderRadius: 4,
+                    marginBottom: 10,
+                    padding: 12,
+                    color: `#000`,
+                  }}
+                  value={valueInput}
+                  onChangeValue={setValueInput}
+                  prefix="R$"
+                  delimiter="."
+                  separator=","
+                  precision={2}
+                />
+              </View>
 
+              {typeModal !== 'entradas' && (
+                <View>
+                  <Text style={{color: '#000'}}>Cenários</Text>
+                  <Picker
+                    selectedValue={pickerSelect}
+                    onValueChange={item => setPickerSelect(item)}
+                    style={{
+                      borderWidth: 0.5,
+                      borderColor: '#84E0FC',
+                      height: 40,
+                      width: 300,
+                      borderRadius: 4,
+                      marginBottom: 10,
+                      padding: 12,
+                      color: '#000',
+                    }}>
+                    <Picker.Item label="Selecionar..." value="0" />
+                    <Picker.Item label="Prioridade baixa" value="1" />
+                    <Picker.Item label="Prioridade média" value="2" />
+                    <Picker.Item label="Prioridade alta" value="3" />
+                  </Picker>
+                </View>
+              )}
+
+              <DatePicker
+                mode="calendar"
+                minuteInterval={30}
+                style={{borderRadius: 10, width: 320}}
+                onSelectedChange={date => setDate(date)}
+                current={format(new Date(), 'yyyy-MM-dd')}
+              />
+            </ScrollView>
+            
             <Pressable
               style={[styles.button, styles.buttonClose]}
               onPress={() => saveData()}>
@@ -421,13 +605,15 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 22,
+    marginTop: 20,
     backgroundColor: 'rgba(0, 0, 0, 0.3)',
   },
   modalView: {
-    margin: 20,
+    margin: 25,
+    paddingLeft: 32,
     backgroundColor: 'white',
     borderRadius: 20,
+    maxHeight: 650,
     padding: 20,
     alignItems: 'center',
     shadowColor: '#000',
@@ -440,9 +626,10 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   button: {
-    borderRadius: 20,
+    width: 300,
+    borderRadius: 4,
     padding: 10,
-    elevation: 2,
+    marginTop: 10,
   },
   buttonOpen: {
     backgroundColor: '#F194FF',

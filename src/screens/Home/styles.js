@@ -28,12 +28,13 @@ export const DivTitle = styled.View`
 
 export const Title = styled.Text`
   font-size: 20px;
+  font-family: ${({theme}) => theme.fonts.regular};
   color: ${({theme}) => theme.colors.text};
 `;
 
 export const Name = styled.Text`
   font-size: 20px;
-  font-weight: bold;
+  font-family: ${({theme}) => theme.fonts.bold};
   color: ${({theme}) => theme.colors.text};
 `;
 
@@ -55,15 +56,40 @@ export const List = styled.FlatList.attrs({
 
 export const DivTotal = styled.View`
   width: 100%;
-  padding: 15px 24px;
+  padding: 15px 24px 30px;
   flex-direction: row;
   justify-content: space-between;
 `;
 
+export const WrapperViewSaldo = styled.ScrollView.attrs({
+  horizontal: true,
+  showsHorizontalScrollIndicator: false,
+  contentContainerStyle: { paddingHorizontal: 24 },
+})`
+  width: 100%;
+`;
+
 export const TotalText = styled.Text`
   color: ${({theme}) => theme.colors.text};
+  font-family: ${({theme}) => theme.fonts.bold};
   font-size: 18px;
-  font-weight: bold;
+`;
+
+export const ArrowContainer = styled.View`
+  width: 100%;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+
+  margin-bottom: 50px;
+`;
+
+export const Label = styled.Text`
+  color: ${({theme}) => theme.colors.text};
+  font-family: ${({theme}) => theme.fonts.regular};
+  font-size: 12px;
+
+  opacity: 0.5;
 `;
 
 export const ButtonHover = styled.TouchableOpacity`
@@ -109,6 +135,7 @@ export const LinhaAction = styled.TouchableOpacity`
 
 export const LinhaActionText = styled.Text`
   color: ${({theme}) => theme.colors.text};
+  font-family: ${({theme}) => theme.fonts.regular};
   font-size: 16px;
 `;
 

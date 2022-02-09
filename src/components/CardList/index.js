@@ -28,23 +28,23 @@ export function CardList({data, stateButton, onLongPress}) {
     <TouchableOpacity activeOpacity={0.6} onLongPress={onLongPress}>
       <ItemContainer>
         <TopContainerItem>
-          <OrigemItem>{data?.origem}</OrigemItem>
+          <OrigemItem tipo={stateButton.dividas}>{data?.origem}</OrigemItem>
 
-          {data.parcelaAtual && (
-            <ParcelasItem>
+          {data.parcelaTotal && (
+            <ParcelasItem tipo={stateButton}>
               {`${data?.parcelaAtual}/${data?.parcelaTotal}`}
             </ParcelasItem>
           )}
 
           {stateButton.dividas && (
-            <TotalItem>
+            <TotalItem tipo={stateButton.dividas}>
               {FormattedCurrency(data.valor * (data.parcelaTotal - (data.parcelaAtual - 1)))}
             </TotalItem>
           )}
         </TopContainerItem>
 
         <TopContainerItem>
-          <ValorItem> {FormattedCurrency(data.valor)}</ValorItem>
+          <ValorItem tipo={stateButton.dividas}> {FormattedCurrency(data.valor)}</ValorItem>
 
           {data.cenario === '1' && <Cenario1Svg width={20} height={20}/> }
           {data.cenario === '2' && <Cenario2Svg width={20} height={20}/> }

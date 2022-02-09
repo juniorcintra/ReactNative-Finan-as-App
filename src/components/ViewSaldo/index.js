@@ -5,16 +5,18 @@ import {
   TitleSaldo,
   DivSaldoText,
   SaldoText,
+  DivPadding
 } from './styles';
 
 export function ViewSaldo({
+  title,
   saldoGeral, 
   hipotético1, 
   hipotético2
 }) {
   return (
     <ViewContainer>
-      <TitleSaldo>Saldo</TitleSaldo>
+      <TitleSaldo>{title}</TitleSaldo>
       <DivSaldoText>
         <SaldoText>Saldo Geral</SaldoText>
         <SaldoText>{`R$ ${saldoGeral.toFixed(2)}`}</SaldoText>
@@ -27,6 +29,7 @@ export function ViewSaldo({
         <SaldoText>Saldo Hipotético 2</SaldoText>
         <SaldoText>{`R$ ${hipotético2.toFixed(2)}`}</SaldoText>
       </DivSaldoText>
+      <DivPadding/>
     </ViewContainer>
   )
 }

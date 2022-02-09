@@ -20,7 +20,7 @@ export default {
   },
 
   fonts: {
-    regular: '',
-    bold: '',
+    regular: 'Roboto-Regular',
+    bold: 'Roboto-Bold',
   }
 }
