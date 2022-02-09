@@ -2,6 +2,12 @@
 <Workspace
    version = "1.0">
    <FileRef
+      location = "group:/Users/juniorcintra/Downloads/Desenvolvimento/Estudos/financas_app/ios/Roboto-Bold.ttf">
+   </FileRef>
+   <FileRef
+      location = "group:/Users/juniorcintra/Downloads/Desenvolvimento/Estudos/financas_app/ios/Roboto-Regular.ttf">
+   </FileRef>
+   <FileRef
       location = "self:">
    </FileRef>
 </Workspace>

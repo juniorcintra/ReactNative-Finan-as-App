@@ -12,6 +12,10 @@
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
+		9255BB6727B3EF3E00A24850 /* Roboto-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9255BB6327B3EC9800A24850 /* Roboto-Bold.ttf */; };
+		9255BB6A27B3EF4100A24850 /* Roboto-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9255BB6427B3EC9900A24850 /* Roboto-Regular.ttf */; };
+		9255BB6D27B3EF4900A24850 /* Roboto-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9255BB6427B3EC9900A24850 /* Roboto-Regular.ttf */; };
+		9255BB7027B3EF4C00A24850 /* Roboto-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9255BB6327B3EC9800A24850 /* Roboto-Bold.ttf */; };
 		95847D5086DB01F000D37170 /* libPods-financas_app.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 116D72ABC6E97CE3AF446004 /* libPods-financas_app.a */; };
 		9BCB6189A216B2F3A30EED77 /* libPods-financas_app-financas_appTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 7AE2D45DE572E6E1831904E5 /* libPods-financas_app-financas_appTests.a */; };
 /* End PBXBuildFile section */
@@ -41,6 +45,8 @@
 		7AE2D45DE572E6E1831904E5 /* libPods-financas_app-financas_appTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-financas_app-financas_appTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = financas_app/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		9248E3E960B08C672C36BC23 /* Pods-financas_app-financas_appTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-financas_app-financas_appTests.debug.xcconfig"; path = "Target Support Files/Pods-financas_app-financas_appTests/Pods-financas_app-financas_appTests.debug.xcconfig"; sourceTree = "<group>"; };
+		9255BB6327B3EC9800A24850 /* Roboto-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "Roboto-Bold.ttf"; path = "/Users/juniorcintra/Downloads/Desenvolvimento/Estudos/financas_app/ios/Roboto-Bold.ttf"; sourceTree = "<absolute>"; };
+		9255BB6427B3EC9900A24850 /* Roboto-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "Roboto-Regular.ttf"; path = "/Users/juniorcintra/Downloads/Desenvolvimento/Estudos/financas_app/ios/Roboto-Regular.ttf"; sourceTree = "<absolute>"; };
 		99F841127EEE0403583A3381 /* Pods-financas_app.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-financas_app.release.xcconfig"; path = "Target Support Files/Pods-financas_app/Pods-financas_app.release.xcconfig"; sourceTree = "<group>"; };
 		C0E427B7B6B8C6321DE39641 /* Pods-financas_app-financas_appTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-financas_app-financas_appTests.release.xcconfig"; path = "Target Support Files/Pods-financas_app-financas_appTests/Pods-financas_app-financas_appTests.release.xcconfig"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
@@ -109,6 +115,8 @@
 		3F2DF949702A40128B433008 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				9255BB6327B3EC9800A24850 /* Roboto-Bold.ttf */,
+				9255BB6427B3EC9900A24850 /* Roboto-Regular.ttf */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
@@ -243,6 +251,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9255BB7027B3EF4C00A24850 /* Roboto-Bold.ttf in Resources */,
+				9255BB6D27B3EF4900A24850 /* Roboto-Regular.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -252,6 +262,8 @@
 			files = (
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
+				9255BB6A27B3EF4100A24850 /* Roboto-Regular.ttf in Resources */,
+				9255BB6727B3EF3E00A24850 /* Roboto-Bold.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
