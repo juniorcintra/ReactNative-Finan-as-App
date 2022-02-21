@@ -93,7 +93,7 @@ export default App = () => {
     var dataUser = await AsyncStorage.getItem('user');
     var user = JSON.parse(dataUser);
 
-    if(!!user){
+    if (!!user) {
       setDadosUser(user);
     } else {
       setShowModalUser(true);
@@ -102,7 +102,7 @@ export default App = () => {
     setDadosEntradas(entradas);
     setDadosSaidas(saidas);
     setDadosDividas(dividas);
-    
+
   }
 
   const handleStateButton = button => {
@@ -248,19 +248,19 @@ export default App = () => {
         nome: nameUserToSave,
       };
 
-     
-        let dataToSave = (await AsyncStorage.getItem('user')) || '[]';
-        dataToSave = JSON.parse(dataToSave);
-        dataToSave.push(dataUserSave);
-        AsyncStorage.setItem('user', JSON.stringify(dataToSave)).then(
-          () => {
-            setShowModalUser(false);
-            setNameUserToSave("");
-          },
-        );
+
+      let dataToSave = (await AsyncStorage.getItem('user')) || '[]';
+      dataToSave = JSON.parse(dataToSave);
+      dataToSave.push(dataUserSave);
+      AsyncStorage.setItem('user', JSON.stringify(dataToSave)).then(
+        () => {
+          setShowModalUser(false);
+          setNameUserToSave("");
+        },
+      );
 
 
-      
+
     } catch (error) {
       alert(error);
     }
@@ -350,10 +350,6 @@ export default App = () => {
     }
   }
 
-  function handleSaldo() {
-
-  }
-
   const handleCloseModal = () => {
     setShowModal(false);
     setValueInput(null);
@@ -371,7 +367,6 @@ export default App = () => {
 
   useEffect(() => {
     handleGetData();
-    handleSaldo();
   }, [showModal]);
 
   return (
@@ -653,22 +648,22 @@ export default App = () => {
             </Text>
 
             <View>
-                <Text style={{ color: '#000' }}>Nome</Text>
-                <TextInput
-                  style={{
-                    borderWidth: 0.5,
-                    borderColor: '#84E0FC',
-                    height: 40,
-                    width: 300,
-                    borderRadius: 4,
-                    marginBottom: 10,
-                    padding: 12,
-                    color: '#000',
-                  }}
-                  onChangeText={setNameUserToSave}
-                  value={nameUserToSave}
-                />
-              </View>
+              <Text style={{ color: '#000' }}>Nome</Text>
+              <TextInput
+                style={{
+                  borderWidth: 0.5,
+                  borderColor: '#84E0FC',
+                  height: 40,
+                  width: 300,
+                  borderRadius: 4,
+                  marginBottom: 10,
+                  padding: 12,
+                  color: '#000',
+                }}
+                onChangeText={setNameUserToSave}
+                value={nameUserToSave}
+              />
+            </View>
 
             <Pressable
               style={[styles.button, styles.buttonClose]}
