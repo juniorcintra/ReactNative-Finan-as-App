@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Modal,
   View,
@@ -12,18 +12,18 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import CurrencyInput from 'react-native-currency-input';
 import DatePicker from 'react-native-modern-datepicker';
-import {Picker} from '@react-native-community/picker';
-import {useTheme} from 'styled-components';
-import {format} from 'date-fns';
+import { Picker } from '@react-native-community/picker';
+import { useTheme } from 'styled-components';
+import { format } from 'date-fns';
 
 import UserSvg from '../../assets/svg/user.svg';
 import AddSvg from '../../assets/svg/iconAdd.svg';
 import ArrowLeft from '../../assets/svg/arrowLeft.svg';
 import ArrowRight from '../../assets/svg/arrowRight.svg';
 
-import {Button} from '../../components/Button';
-import {CardList} from '../../components/CardList';
-import {ViewSaldo} from '../../components/ViewSaldo';
+import { Button } from '../../components/Button';
+import { CardList } from '../../components/CardList';
+import { ViewSaldo } from '../../components/ViewSaldo';
 
 import {
   MainView,
@@ -47,7 +47,7 @@ import {
 } from './styles';
 
 export default App = () => {
-  const {colors} = useTheme();
+  const { colors } = useTheme();
 
   const [stateButton, setStateButton] = useState({
     entradas: true,
@@ -56,6 +56,7 @@ export default App = () => {
   });
   const [showActions, setShowActions] = useState(false);
   const [showModal, setShowModal] = useState(false);
+  const [showModalUser, setShowModalUser] = useState(false);
   const [typeModal, setTypeModal] = useState('');
 
   const [origem, setOrigem] = useState('');
@@ -64,10 +65,12 @@ export default App = () => {
   const [parcelaAtual, setParcelaAtual] = useState(0);
   const [parcelaTotal, setParcelaTotal] = useState(0);
   const [pickerSelect, setPickerSelect] = useState('0');
+  const [nameUserToSave, setNameUserToSave] = useState("");
 
   const [dadosEntradas, setDadosEntradas] = useState([]);
   const [dadosSaidas, setDadosSaidas] = useState([]);
   const [dadosDividas, setDadosDividas] = useState([]);
+  const [dadosUser, setDadosUser] = useState([]);
 
   const [cenarioEntradaUm, setCenarioEntradaUm] = useState(0);
   const [cenarioSaidaUm, setCenarioSaidaUm] = useState(0);
@@ -87,9 +90,19 @@ export default App = () => {
     var dataDividas = await AsyncStorage.getItem('dividas');
     var dividas = JSON.parse(dataDividas);
 
+    var dataUser = await AsyncStorage.getItem('user');
+    var user = JSON.parse(dataUser);
+
+    if(!!user){
+      setDadosUser(user);
+    } else {
+      setShowModalUser(true);
+    }
+
     setDadosEntradas(entradas);
     setDadosSaidas(saidas);
     setDadosDividas(dividas);
+    
   }
 
   const handleStateButton = button => {
@@ -228,6 +241,31 @@ export default App = () => {
     }
   };
 
+  saveDataUser = async () => {
+    try {
+      let dataUserSave = {
+        id: Math.floor(Date.now() * Math.random()).toString(36),
+        nome: nameUserToSave,
+      };
+
+     
+        let dataToSave = (await AsyncStorage.getItem('user')) || '[]';
+        dataToSave = JSON.parse(dataToSave);
+        dataToSave.push(dataUserSave);
+        AsyncStorage.setItem('user', JSON.stringify(dataToSave)).then(
+          () => {
+            setShowModalUser(false);
+            setNameUserToSave("");
+          },
+        );
+
+
+      
+    } catch (error) {
+      alert(error);
+    }
+  };
+
   async function handleRemoveItem(item) {
     //remover o card de entrada
     if (stateButton.entradas) {
@@ -313,7 +351,7 @@ export default App = () => {
   }
 
   function handleSaldo() {
-    
+
   }
 
   const handleCloseModal = () => {
@@ -341,7 +379,7 @@ export default App = () => {
       <Header>
         <DivTitle>
           <Title>Olá, </Title>
-          <Name>Fulano!</Name>
+          <Name>{dadosUser[0]?.nome}!</Name>
         </DivTitle>
         <UserSvg width={30} height={30} />
       </Header>
@@ -378,10 +416,10 @@ export default App = () => {
           stateButton.entradas
             ? dadosEntradas
             : stateButton.saidas
-            ? dadosSaidas
-            : dadosDividas
+              ? dadosSaidas
+              : dadosDividas
         }
-        renderItem={({item}) => (
+        renderItem={({ item }) => (
           <CardList
             data={item}
             stateButton={stateButton}
@@ -396,34 +434,34 @@ export default App = () => {
             <TotalText>Total</TotalText>
             <TotalText>{handleSum()}</TotalText>
           </>
-        ): <TotalText/>}
+        ) : <TotalText />}
       </DivTotal>
-      
+
       <WrapperViewSaldo>
         <ViewSaldo
           title="Saldo geral"
-          saldoGeral={3500} 
-          hipotético1={800} 
-          hipotético2={1200} 
+          saldoGeral={3500}
+          hipotético1={800}
+          hipotético2={1200}
         />
         <ViewSaldo
           title="Total de saídas"
-          saldoGeral={3500} 
-          hipotético1={800} 
-          hipotético2={1200} 
+          saldoGeral={3500}
+          hipotético1={800}
+          hipotético2={1200}
         />
         <ViewSaldo
           title="Total de dividas"
-          saldoGeral={3500} 
-          hipotético1={800} 
-          hipotético2={1200} 
+          saldoGeral={3500}
+          hipotético1={800}
+          hipotético2={1200}
         />
       </WrapperViewSaldo>
 
       <ArrowContainer>
-        <ArrowLeft width={20} height={20}/>
+        <ArrowLeft width={20} height={20} />
         <Label>Arraste para o lado</Label>
-        <ArrowRight width={20} height={20}/>
+        <ArrowRight width={20} height={20} />
       </ArrowContainer>
 
       <ButtonHover
@@ -473,13 +511,13 @@ export default App = () => {
               {typeModal === 'entradas'
                 ? 'entrada'
                 : typeModal === 'saidas'
-                ? 'saída'
-                : 'dívida'}
+                  ? 'saída'
+                  : 'dívida'}
             </Text>
 
             <ScrollView showsVerticalScrollIndicator={false}>
               <View>
-                <Text style={{color: '#000'}}>Origem</Text>
+                <Text style={{ color: '#000' }}>Origem</Text>
                 <TextInput
                   style={{
                     borderWidth: 0.5,
@@ -495,27 +533,27 @@ export default App = () => {
                   value={origem}
                 />
               </View>
-                
+
               {typeModal === 'dividas' && (
                 <View style={{ flexDirection: 'row', width: 300, justifyContent: 'space-between' }}>
-                  <View style={{width: '45%'}}>
-                  <Text style={{color: '#000'}}>Parcela Atual</Text>
-                  <TextInput
-                    style={{
-                      borderWidth: 0.5,
-                      borderColor: '#84E0FC',
-                      height: 40,
-                      borderRadius: 4,
-                      marginBottom: 10,
-                      padding: 12,
-                      color: '#000',
-                    }}
-                    onChangeText={setParcelaAtual}
-                    value={parcelaAtual}
-                  />
+                  <View style={{ width: '45%' }}>
+                    <Text style={{ color: '#000' }}>Parcela Atual</Text>
+                    <TextInput
+                      style={{
+                        borderWidth: 0.5,
+                        borderColor: '#84E0FC',
+                        height: 40,
+                        borderRadius: 4,
+                        marginBottom: 10,
+                        padding: 12,
+                        color: '#000',
+                      }}
+                      onChangeText={setParcelaAtual}
+                      value={parcelaAtual}
+                    />
                   </View >
-                    <View style={{width: '45%'}}>
-                    <Text style={{color: '#000'}}>Total de Parcela</Text>
+                  <View style={{ width: '45%' }}>
+                    <Text style={{ color: '#000' }}>Total de Parcela</Text>
                     <TextInput
                       style={{
                         borderWidth: 0.5,
@@ -534,7 +572,7 @@ export default App = () => {
               )}
 
               <View>
-                <Text style={{color: '#000'}}>Valor</Text>
+                <Text style={{ color: '#000' }}>Valor</Text>
                 <CurrencyInput
                   style={{
                     borderWidth: 0.5,
@@ -557,7 +595,7 @@ export default App = () => {
 
               {typeModal !== 'entradas' && (
                 <View>
-                  <Text style={{color: '#000'}}>Cenários</Text>
+                  <Text style={{ color: '#000' }}>Cenários</Text>
                   <Picker
                     selectedValue={pickerSelect}
                     onValueChange={item => setPickerSelect(item)}
@@ -582,15 +620,59 @@ export default App = () => {
               <DatePicker
                 mode="calendar"
                 minuteInterval={30}
-                style={{borderRadius: 10, width: 320}}
+                style={{ borderRadius: 10, width: 320 }}
                 onSelectedChange={date => setDate(date)}
                 current={format(new Date(), 'yyyy-MM-dd')}
               />
             </ScrollView>
-            
+
             <Pressable
               style={[styles.button, styles.buttonClose]}
               onPress={() => saveData()}>
+              <Text style={styles.textStyle}>Cadastrar</Text>
+            </Pressable>
+          </View>
+        </View>
+      </Modal>
+
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={showModalUser}
+        onRequestClose={() => {
+          setShowModalUser(!showModalUser);
+        }}>
+        <View style={styles.centeredView}>
+          <View style={styles.modalView}>
+            <ButtonClose onPress={() => handleCloseModal()}>
+              <ButtonIcon size="24px">X</ButtonIcon>
+            </ButtonClose>
+
+            <Text style={styles.modalText}>
+              Cadastre seu nome
+            </Text>
+
+            <View>
+                <Text style={{ color: '#000' }}>Nome</Text>
+                <TextInput
+                  style={{
+                    borderWidth: 0.5,
+                    borderColor: '#84E0FC',
+                    height: 40,
+                    width: 300,
+                    borderRadius: 4,
+                    marginBottom: 10,
+                    padding: 12,
+                    color: '#000',
+                  }}
+                  onChangeText={setNameUserToSave}
+                  value={nameUserToSave}
+                />
+              </View>
+
+            <Pressable
+              style={[styles.button, styles.buttonClose]}
+              onPress={() => saveDataUser()}>
               <Text style={styles.textStyle}>Cadastrar</Text>
             </Pressable>
           </View>
