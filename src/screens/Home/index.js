@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   Modal,
   View,
@@ -12,18 +12,18 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import CurrencyInput from 'react-native-currency-input';
 import DatePicker from 'react-native-modern-datepicker';
-import { Picker } from '@react-native-community/picker';
-import { useTheme } from 'styled-components';
-import { format } from 'date-fns';
+import {Picker} from '@react-native-community/picker';
+import {useTheme} from 'styled-components';
+import {format} from 'date-fns';
 
 import UserSvg from '../../assets/svg/user.svg';
 import AddSvg from '../../assets/svg/iconAdd.svg';
 import ArrowLeft from '../../assets/svg/arrowLeft.svg';
 import ArrowRight from '../../assets/svg/arrowRight.svg';
 
-import { Button } from '../../components/Button';
-import { CardList } from '../../components/CardList';
-import { ViewSaldo } from '../../components/ViewSaldo';
+import {Button} from '../../components/Button';
+import {CardList} from '../../components/CardList';
+import {ViewSaldo} from '../../components/ViewSaldo';
 
 import {
   MainView,
@@ -47,7 +47,7 @@ import {
 } from './styles';
 
 export default App = () => {
-  const { colors } = useTheme();
+  const {colors} = useTheme();
 
   const [stateButton, setStateButton] = useState({
     entradas: true,
@@ -65,20 +65,26 @@ export default App = () => {
   const [parcelaAtual, setParcelaAtual] = useState(0);
   const [parcelaTotal, setParcelaTotal] = useState(0);
   const [pickerSelect, setPickerSelect] = useState('0');
-  const [nameUserToSave, setNameUserToSave] = useState("");
+  const [nameUserToSave, setNameUserToSave] = useState('');
 
   const [dadosEntradas, setDadosEntradas] = useState([]);
   const [dadosSaidas, setDadosSaidas] = useState([]);
   const [dadosDividas, setDadosDividas] = useState([]);
   const [dadosUser, setDadosUser] = useState([]);
 
-  const [cenarioEntradaUm, setCenarioEntradaUm] = useState(0);
-  const [cenarioSaidaUm, setCenarioSaidaUm] = useState(0);
-  const [cenarioDividaUm, setCenarioDividaUm] = useState(0);
+  const [saldoTotal, setSaldoTotal] = useState(0);
 
-  const [cenarioDividaDois, setCenarioDividaDois] = useState(0);
+  const [cenarioSaidaGeral, setCenarioSaidaGeral] = useState(0);
+  const [cenarioSaidaUm, setCenarioSaidaUm] = useState(0);
   const [cenarioSaidaDois, setCenarioSaidaDois] = useState(0);
-  const [cenarioEntradaDois, setCenarioEntradaDois] = useState(0);
+
+  const [cenarioDividaGeral, setCenarioDividaGeral] = useState(0);
+  const [cenarioDividaUm, setCenarioDividaUm] = useState(0);
+  const [cenarioDividaDois, setCenarioDividaDois] = useState(0);
+
+  const [cenarioSaldoGeral, setCenarioSaldoGeral] = useState(0);
+  const [cenarioSaldoUm, setCenarioSaldoUm] = useState(0);
+  const [cenarioSaldoDois, setCenarioSaldoDois] = useState(0);
 
   async function handleGetData() {
     var dataEntradas = await AsyncStorage.getItem('entradas');
@@ -102,7 +108,96 @@ export default App = () => {
     setDadosEntradas(entradas);
     setDadosSaidas(saidas);
     setDadosDividas(dividas);
+  }
 
+  function handleCalculateSaida() {
+    let saldoGeralArray = 0;
+    let saldoCenarioUm = 0;
+    let saldoCenarioDois = 0;
+
+    for (let index = 0; index < dadosSaidas?.length; index++) {
+      const element = dadosSaidas[index];
+      saldoGeralArray = saldoGeralArray + parseFloat(element.valor);
+    }
+
+    let saldoCenarioUmArray = dadosSaidas.filter(
+      element => element.cenario !== '3',
+    );
+
+    for (let index = 0; index < saldoCenarioUmArray?.length; index++) {
+      const element = saldoCenarioUmArray[index];
+      saldoCenarioUm = saldoCenarioUm + parseFloat(element.valor);
+    }
+
+    let saldoCenarioDoisArray = dadosSaidas.filter(
+      element => element.cenario === '1',
+    );
+
+    for (let index = 0; index < saldoCenarioDoisArray?.length; index++) {
+      const element = saldoCenarioDoisArray[index];
+      saldoCenarioDois = saldoCenarioDois + parseFloat(element.valor);
+    }
+
+    setCenarioSaidaGeral(saldoGeralArray);
+    setCenarioSaidaUm(saldoCenarioUm);
+    setCenarioSaidaDois(saldoCenarioDois);
+  }
+
+  function handleCalculateDivida() {
+    let saldoGeralArray = 0;
+    let saldoCenarioUm = 0;
+    let saldoCenarioDois = 0;
+
+    for (let index = 0; index < dadosDividas?.length; index++) {
+      const element = dadosDividas[index];
+      saldoGeralArray = saldoGeralArray + parseFloat(element.valor);
+    }
+
+    let saldoCenarioUmArray = dadosDividas.filter(
+      element => element.cenario !== '3',
+    );
+
+    for (let index = 0; index < saldoCenarioUmArray?.length; index++) {
+      const element = saldoCenarioUmArray[index];
+      saldoCenarioUm = saldoCenarioUm + parseFloat(element.valor);
+    }
+
+    let saldoCenarioDoisArray = dadosDividas.filter(
+      element => element.cenario === '1',
+    );
+
+    for (let index = 0; index < saldoCenarioDoisArray?.length; index++) {
+      const element = saldoCenarioDoisArray[index];
+      saldoCenarioDois = saldoCenarioDois + parseFloat(element.valor);
+    }
+
+    setCenarioDividaGeral(saldoGeralArray);
+    setCenarioDividaUm(saldoCenarioUm);
+    setCenarioDividaDois(saldoCenarioDois);
+  }
+
+  function handleCalculateSaldo() {
+    let saldoGeralArray = 0;
+    let saldoCenarioUm = 0;
+    let saldoCenarioDois = 0;
+
+    let sum = 0;
+    for (let index = 0; index < dadosEntradas?.length; index++) {
+      const element = dadosEntradas[index];
+      sum = sum + parseFloat(element.valor);
+    }
+
+    let somaGeral = cenarioDividaGeral + cenarioSaidaGeral;
+    let somaCenario1 = cenarioDividaUm + cenarioSaidaUm;
+    let somaCenario2 = cenarioDividaDois + cenarioSaidaDois;
+
+    saldoGeralArray = sum - somaGeral;
+    saldoCenarioUm = sum - somaCenario1;
+    saldoCenarioDois = sum - somaCenario2;
+
+    setCenarioSaldoGeral(saldoGeralArray);
+    setCenarioSaldoUm(saldoCenarioUm);
+    setCenarioSaldoDois(saldoCenarioDois);
   }
 
   const handleStateButton = button => {
@@ -143,7 +238,11 @@ export default App = () => {
     if (stateButton.dividas) {
       for (let index = 0; index < dadosDividas?.length; index++) {
         const element = dadosDividas[index];
-        sum = sum + parseFloat(element.valor * (element.parcelaTotal - (element.parcelaAtual - 1)));
+        sum =
+          sum +
+          parseFloat(
+            element.valor * (element.parcelaTotal - (element.parcelaAtual - 1)),
+          );
       }
     }
 
@@ -248,19 +347,13 @@ export default App = () => {
         nome: nameUserToSave,
       };
 
-
       let dataToSave = (await AsyncStorage.getItem('user')) || '[]';
       dataToSave = JSON.parse(dataToSave);
       dataToSave.push(dataUserSave);
-      AsyncStorage.setItem('user', JSON.stringify(dataToSave)).then(
-        () => {
-          setShowModalUser(false);
-          setNameUserToSave("");
-        },
-      );
-
-
-
+      AsyncStorage.setItem('user', JSON.stringify(dataToSave)).then(() => {
+        setShowModalUser(false);
+        setNameUserToSave('');
+      });
     } catch (error) {
       alert(error);
     }
@@ -311,12 +404,11 @@ export default App = () => {
               element => element.id !== item.id,
             );
 
-            AsyncStorage.setItem(
-              'saidas',
-              JSON.stringify(newDataToSave),
-            ).then(() => {
-              handleGetData();
-            });
+            AsyncStorage.setItem('saidas', JSON.stringify(newDataToSave)).then(
+              () => {
+                handleGetData();
+              },
+            );
           },
         },
       ]);
@@ -338,12 +430,11 @@ export default App = () => {
               element => element.id !== item.id,
             );
 
-            AsyncStorage.setItem(
-              'dividas',
-              JSON.stringify(newDataToSave),
-            ).then(() => {
-              handleGetData();
-            });
+            AsyncStorage.setItem('dividas', JSON.stringify(newDataToSave)).then(
+              () => {
+                handleGetData();
+              },
+            );
           },
         },
       ]);
@@ -355,8 +446,8 @@ export default App = () => {
     setValueInput(null);
     setOrigem('');
     setPickerSelect('0');
-    setParcelaAtual(0)
-    setParcelaTotal(0)
+    setParcelaAtual(0);
+    setParcelaTotal(0);
   };
 
   const handleShowModal = type => {
@@ -367,7 +458,13 @@ export default App = () => {
 
   useEffect(() => {
     handleGetData();
-  }, [showModal]);
+  }, [showModal, showModalUser]);
+
+  useEffect(() => {
+    handleCalculateSaldo();
+    handleCalculateSaida();
+    handleCalculateDivida();
+  }, [dadosDividas, dadosSaidas, dadosEntradas]);
 
   return (
     <MainView>
@@ -411,10 +508,10 @@ export default App = () => {
           stateButton.entradas
             ? dadosEntradas
             : stateButton.saidas
-              ? dadosSaidas
-              : dadosDividas
+            ? dadosSaidas
+            : dadosDividas
         }
-        renderItem={({ item }) => (
+        renderItem={({item}) => (
           <CardList
             data={item}
             stateButton={stateButton}
@@ -429,27 +526,32 @@ export default App = () => {
             <TotalText>Total</TotalText>
             <TotalText>{handleSum()}</TotalText>
           </>
-        ) : <TotalText />}
+        ) : (
+          <TotalText />
+        )}
       </DivTotal>
 
       <WrapperViewSaldo>
         <ViewSaldo
+          saldo={true}
           title="Saldo geral"
-          saldoGeral={3500}
-          hipotético1={800}
-          hipotético2={1200}
+          saldoGeral={cenarioSaldoGeral}
+          hipotetico1={cenarioSaldoUm}
+          hipotetico2={cenarioSaldoDois}
         />
         <ViewSaldo
+          saldo={false}
           title="Total de saídas"
-          saldoGeral={3500}
-          hipotético1={800}
-          hipotético2={1200}
+          saldoGeral={cenarioSaidaGeral}
+          hipotetico1={cenarioSaidaUm}
+          hipotetico2={cenarioSaidaDois}
         />
         <ViewSaldo
+          saldo={false}
           title="Total de dividas"
-          saldoGeral={3500}
-          hipotético1={800}
-          hipotético2={1200}
+          saldoGeral={cenarioDividaGeral}
+          hipotetico1={cenarioDividaUm}
+          hipotetico2={cenarioDividaDois}
         />
       </WrapperViewSaldo>
 
@@ -506,13 +608,13 @@ export default App = () => {
               {typeModal === 'entradas'
                 ? 'entrada'
                 : typeModal === 'saidas'
-                  ? 'saída'
-                  : 'dívida'}
+                ? 'saída'
+                : 'dívida'}
             </Text>
 
             <ScrollView showsVerticalScrollIndicator={false}>
               <View>
-                <Text style={{ color: '#000' }}>Origem</Text>
+                <Text style={{color: '#000'}}>Origem</Text>
                 <TextInput
                   style={{
                     borderWidth: 0.5,
@@ -530,9 +632,14 @@ export default App = () => {
               </View>
 
               {typeModal === 'dividas' && (
-                <View style={{ flexDirection: 'row', width: 300, justifyContent: 'space-between' }}>
-                  <View style={{ width: '45%' }}>
-                    <Text style={{ color: '#000' }}>Parcela Atual</Text>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    width: 300,
+                    justifyContent: 'space-between',
+                  }}>
+                  <View style={{width: '45%'}}>
+                    <Text style={{color: '#000'}}>Parcela Atual</Text>
                     <TextInput
                       style={{
                         borderWidth: 0.5,
@@ -546,9 +653,9 @@ export default App = () => {
                       onChangeText={setParcelaAtual}
                       value={parcelaAtual}
                     />
-                  </View >
-                  <View style={{ width: '45%' }}>
-                    <Text style={{ color: '#000' }}>Total de Parcela</Text>
+                  </View>
+                  <View style={{width: '45%'}}>
+                    <Text style={{color: '#000'}}>Total de Parcela</Text>
                     <TextInput
                       style={{
                         borderWidth: 0.5,
@@ -567,7 +674,7 @@ export default App = () => {
               )}
 
               <View>
-                <Text style={{ color: '#000' }}>Valor</Text>
+                <Text style={{color: '#000'}}>Valor</Text>
                 <CurrencyInput
                   style={{
                     borderWidth: 0.5,
@@ -590,7 +697,7 @@ export default App = () => {
 
               {typeModal !== 'entradas' && (
                 <View>
-                  <Text style={{ color: '#000' }}>Cenários</Text>
+                  <Text style={{color: '#000'}}>Cenários</Text>
                   <Picker
                     selectedValue={pickerSelect}
                     onValueChange={item => setPickerSelect(item)}
@@ -615,7 +722,7 @@ export default App = () => {
               <DatePicker
                 mode="calendar"
                 minuteInterval={30}
-                style={{ borderRadius: 10, width: 320 }}
+                style={{borderRadius: 10, width: 320}}
                 onSelectedChange={date => setDate(date)}
                 current={format(new Date(), 'yyyy-MM-dd')}
               />
@@ -643,12 +750,10 @@ export default App = () => {
               <ButtonIcon size="24px">X</ButtonIcon>
             </ButtonClose>
 
-            <Text style={styles.modalText}>
-              Cadastre seu nome
-            </Text>
+            <Text style={styles.modalText}>Cadastre seu nome</Text>
 
             <View>
-              <Text style={{ color: '#000' }}>Nome</Text>
+              <Text style={{color: '#000'}}>Nome</Text>
               <TextInput
                 style={{
                   borderWidth: 0.5,

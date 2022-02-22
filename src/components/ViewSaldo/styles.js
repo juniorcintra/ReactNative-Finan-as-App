@@ -27,6 +27,18 @@ export const TitleSaldo = styled.Text`
   padding: 15px 0 10px 0;
 `;
 
+export const DivSaldoTextEntradas = styled.View`
+  width: 100%;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px 12px;
+  background-color: ${({saldo,saldoGeral, theme}) =>  saldoGeral >= 0 
+    ? theme.colors.entrada
+    : theme.colors.divida
+  };
+`;
+
 export const DivSaldoText = styled.View`
   width: 100%;
   flex-direction: row;

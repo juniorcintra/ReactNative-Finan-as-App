@@ -1,35 +1,63 @@
-import React from "react";
+import React from 'react';
 
-import { 
+import {
   ViewContainer,
   TitleSaldo,
   DivSaldoText,
   SaldoText,
-  DivPadding
+  DivPadding,
+  DivSaldoTextEntradas,
 } from './styles';
 
 export function ViewSaldo({
   title,
-  saldoGeral, 
-  hipotético1, 
-  hipotético2
+  saldoGeral,
+  hipotetico1,
+  hipotetico2,
+  saldo = false,
 }) {
+
+  function handleFormat(valor){
+   return new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency: 'BRL',
+    }).format(valor);
+  }
   return (
     <ViewContainer>
       <TitleSaldo>{title}</TitleSaldo>
-      <DivSaldoText>
-        <SaldoText>Saldo Geral</SaldoText>
-        <SaldoText>{`R$ ${saldoGeral.toFixed(2)}`}</SaldoText>
-      </DivSaldoText>
-      <DivSaldoText>
-        <SaldoText>Saldo Hipotético 1</SaldoText>
-        <SaldoText>{`R$ ${hipotético1.toFixed(2)}`}</SaldoText>
-      </DivSaldoText>
-      <DivSaldoText>
-        <SaldoText>Saldo Hipotético 2</SaldoText>
-        <SaldoText>{`R$ ${hipotético2.toFixed(2)}`}</SaldoText>
-      </DivSaldoText>
-      <DivPadding/>
+      {saldo ? (
+        <>
+          <DivSaldoTextEntradas saldoGeral={saldoGeral}>
+            <SaldoText>Saldo Geral</SaldoText>
+            <SaldoText>{handleFormat(saldoGeral)}</SaldoText>
+          </DivSaldoTextEntradas>
+          <DivSaldoTextEntradas saldoGeral={hipotetico1}>
+            <SaldoText>Saldo Hipotético 1</SaldoText>
+            <SaldoText>{handleFormat(hipotetico1)}</SaldoText>
+          </DivSaldoTextEntradas>
+          <DivSaldoTextEntradas saldoGeral={hipotetico2}>
+            <SaldoText>Saldo Hipotético 2</SaldoText>
+            <SaldoText>{handleFormat(hipotetico2)}</SaldoText>
+          </DivSaldoTextEntradas>
+        </>
+      ) : (
+        <>
+          <DivSaldoText saldo saldoGeral>
+            <SaldoText>Saldo Geral</SaldoText>
+            <SaldoText>{handleFormat(saldoGeral)}</SaldoText>
+          </DivSaldoText>
+          <DivSaldoText>
+            <SaldoText>Saldo Hipotético 1</SaldoText>
+            <SaldoText>{handleFormat(hipotetico1)}</SaldoText>
+          </DivSaldoText>
+          <DivSaldoText>
+            <SaldoText>Saldo Hipotético 2</SaldoText>
+            <SaldoText>{handleFormat(hipotetico2)}</SaldoText>
+          </DivSaldoText>
+          <DivPadding />
+        </>
+      )}
     </ViewContainer>
-  )
+  );
 }
